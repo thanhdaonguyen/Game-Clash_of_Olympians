@@ -47,7 +47,7 @@ public:
 
 private:
     //The actual hardware texture
-    SDL_Texture* mTexture;
+    SDL_Texture* mTexture = NULL;
     //Image dimensions
     int mWidth;
     int mHeight;
