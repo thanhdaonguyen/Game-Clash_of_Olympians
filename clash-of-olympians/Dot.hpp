@@ -18,7 +18,11 @@ public:
     //The dimensions of the dot
     static const int DOT_WIDTH = 20;
     static const int DOT_HEIGHT = 20;
-    static const int DOT_THROW_VEL = 12;
+    //The max velocity of the dot
+    double DOT_THROW_VEL = 12;
+    //The real velocity
+    double mVel = DOT_THROW_VEL;
+    //the screen 
     const int SCREEN_WIDTH = 1200;
     const int SCREEN_HEIGHT = 700;
     
@@ -40,6 +44,8 @@ public:
     double getPosX();
     
     double getPosY();
+    
+    bool isTouched = false;
 
     //Get the collision boxes
     std::vector<SDL_Rect>& getColliders();
@@ -51,8 +57,9 @@ private:
     //The x and y input
     double mcPosX, mcPosY;
     
-    //The velocity of the dot
+    //The velocity acording to coordinates of the dot
     double mVelX, mVelY;
+    
     
     //Dot's collision boxes
     std::vector<SDL_Rect> mColliders;

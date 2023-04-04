@@ -65,8 +65,8 @@ void Dot::handleEvent(SDL_Event &e) {
     if (e.type == SDL_MOUSEBUTTONUP) {
         int x, y;
         SDL_GetMouseState(&x, &y);
-        mVelX = (double)DOT_THROW_VEL*(x - DOT_WIDTH/2 - mPosX)/sqrt((x - mPosX)*(x - mPosX) + (y - mPosY)*(y - mPosY));
-        mVelY = (double)DOT_THROW_VEL*(y - DOT_HEIGHT/2 - mPosY)/sqrt((x - mPosX)*(x - mPosX) + (y - mPosY)*(y - mPosY));
+        mVelX = mVel*(x - DOT_WIDTH/2 - mPosX)/sqrt((x - mPosX)*(x - mPosX) + (y - mPosY)*(y - mPosY));
+        mVelY = mVel*(y - DOT_HEIGHT/2 - mPosY)/sqrt((x - mPosX)*(x - mPosX) + (y - mPosY)*(y - mPosY));
         
     }
 }
@@ -83,22 +83,13 @@ void Dot::move() {
     if ( mPosX < 0 || mPosX + DOT_WIDTH > SCREEN_WIDTH) {
         //move back
         //mPosX -= mVelX;
-        mPosX = mcPosX - 100;
-        mPosY = mcPosY - 100;
-        mVelX = 0;
-        mVelY = 0;
-        shiftColliders();
+        isTouched = true;
     }
     
     //If the dot went too far
     if (mPosY < 0 || mPosY + DOT_HEIGHT > SCREEN_HEIGHT-50) {
         //move back
-        //mPosY -= mVelY;
-        mPosX = mcPosX - 100;
-        mPosY = mcPosY - 100;
-        mVelX = 0;
-        mVelY = 0;
-        shiftColliders();
+        isTouched = true;
     }
 }
 

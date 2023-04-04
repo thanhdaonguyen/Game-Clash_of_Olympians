@@ -138,13 +138,14 @@ int main( int argc, char* args[] ) {
             
             //the dots that will be moving on the screen
             vector<Dot*> dotVec;
-//            Dot dot(320,470);
-//            Dot* ptr = &dot;
-//            dotVec.push_back(ptr);
             
             //The hero
             Hero myHero(230,450);
             myHero.getImage("assets/Shieldmaiden/4x/idle_1.png");
+            
+            //The force bar
+            SDL_Rect forcebar = {270, 430, 0, 10};
+            bool forceHold = false;
             
             
             //While application is running
@@ -157,15 +158,27 @@ int main( int argc, char* args[] ) {
                     }
                     if( e.type == SDL_MOUSEBUTTONDOWN) {
                         dotVec.push_back(new Dot(320,470));
+                        forceHold = true;
                     }
+                    
+                    if( e.type == SDL_MOUSEBUTTONUP) {
+                        forceHold = false;
+                        dotVec.back()->mVel = dotVec.back()->DOT_THROW_VEL*double(forcebar.w)/60;
+                        forcebar.w = 0;
+                    }
+                    
                     if (dotVec.size() != 0) (dotVec.back())->handleEvent(e);
+                    
                     
 
                 }
+                // force bar
+                if (forceHold && forcebar.w < 60) forcebar.w += 1;
+                
                 // move dots
                 int k = (int)dotVec.size();
                 for (int i = k - 1; i >= 0; i--) {
-                    if (dotVec[i]->getPosX() == 220 && dotVec[i]->getPosY() == 370) {
+                    if (dotVec[i]->isTouched) {
                         delete dotVec[i];
                         dotVec.erase(dotVec.begin() + i);
                         dotVec.shrink_to_fit();
@@ -189,8 +202,14 @@ int main( int argc, char* args[] ) {
                 //render hero
                 myHero.render(gRenderer, gHero);
                 
+                //render force bar
+                SDL_SetRenderDrawColor(gRenderer, 100, 200, 40, 0); // set color to blue
+                SDL_RenderFillRect(gRenderer, &forcebar); // draw filled rectangle
+                
                 //Present
                 SDL_RenderPresent(gRenderer);
+                
+                
             }
         }
     }
