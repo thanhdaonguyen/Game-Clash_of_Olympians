@@ -4,7 +4,7 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
-		<key>Game:Clash_of_Olympians.xcscheme_^#shared#^_</key>
+		<key>clash-of-olympians.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>0</integer>
@@ -12,7 +12,7 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
-		<key>B8DDDB6129C4CAC000F4F1C7</key>
+		<key>B894F70A29DBC0D80026553A</key>
 		<dict>
 			<key>primary</key>
 			<true/>

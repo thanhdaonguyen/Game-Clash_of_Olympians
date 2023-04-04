@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "B8DDDB6129C4CAC000F4F1C7"
-               BuildableName = "Game:Clash_of_Olympians"
-               BlueprintName = "Game:Clash_of_Olympians"
-               ReferencedContainer = "container:Game:Clash_of_Olympians.xcodeproj">
+               BlueprintIdentifier = "B894F70A29DBC0D80026553A"
+               BuildableName = "clash-of-olympians"
+               BlueprintName = "clash-of-olympians"
+               ReferencedContainer = "container:clash-of-olympians.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -36,7 +36,7 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       launchStyle = "0"
       useCustomWorkingDirectory = "YES"
-      customWorkingDirectory = "/Users/thanhdaonguyen/Documents/Tha&#x300;nh &#x110;a&#x323;o/C(++) basics/Game:Clash_of_Olympians/Game:Clash_of_Olympians"
+      customWorkingDirectory = "/Users/thanhdaonguyen/Documents/Tha&#x300;nh &#x110;a&#x323;o/C(++) basics/clash-of-olympians/clash-of-olympians"
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
@@ -47,10 +47,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "B8DDDB6129C4CAC000F4F1C7"
-            BuildableName = "Game:Clash_of_Olympians"
-            BlueprintName = "Game:Clash_of_Olympians"
-            ReferencedContainer = "container:Game:Clash_of_Olympians.xcodeproj">
+            BlueprintIdentifier = "B894F70A29DBC0D80026553A"
+            BuildableName = "clash-of-olympians"
+            BlueprintName = "clash-of-olympians"
+            ReferencedContainer = "container:clash-of-olympians.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -64,10 +64,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "B8DDDB6129C4CAC000F4F1C7"
-            BuildableName = "Game:Clash_of_Olympians"
-            BlueprintName = "Game:Clash_of_Olympians"
-            ReferencedContainer = "container:Game:Clash_of_Olympians.xcodeproj">
+            BlueprintIdentifier = "B894F70A29DBC0D80026553A"
+            BuildableName = "clash-of-olympians"
+            BlueprintName = "clash-of-olympians"
+            ReferencedContainer = "container:clash-of-olympians.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

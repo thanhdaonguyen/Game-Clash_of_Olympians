@@ -44,10 +44,11 @@ public:
     //Get image dimensions
     int getWidth();
     int getHeigt();
-
-private:
+    
     //The actual hardware texture
     SDL_Texture* mTexture = NULL;
+private:
+    
     //Image dimensions
     int mWidth;
     int mHeight;

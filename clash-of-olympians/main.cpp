@@ -9,16 +9,8 @@
 using namespace std;
 
 //Screen dimension constants
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
-
-//Texture wrapper class
-
-
-//The dot that will move around on the screen
-
-
-//The hero
+const int SCREEN_WIDTH = 1200;
+const int SCREEN_HEIGHT = 700;
 
 
 //Starts up SDL and creates window
@@ -39,10 +31,7 @@ SDL_Renderer* gRenderer = NULL;
 //Scene textures
 LTexture gDotTexture(gRenderer);
 LTexture gHero(gRenderer);
-
-
-
-
+LTexture gBG(gRenderer);
 
 
 
@@ -95,8 +84,13 @@ bool loadMedia() {
     //Loading success flag
     bool success = true;
     
-    if(!gDotTexture.loadFromFile(gRenderer,"26_motion/dot.bmp")) {
+    if(!gDotTexture.loadFromFile(gRenderer,"assets/26_motion/dot.bmp")) {
         printf ("Failed to load dot image");
+        success = false;
+    }
+    
+    if(!gBG.loadFromFile(gRenderer,"assets/background.png")) {
+        printf ("Failed to load background image");
         success = false;
     }
     
@@ -108,6 +102,7 @@ void close() {
     //Free loaded images
     gDotTexture.free();
     gHero.free();
+    gBG.free();
 
     //destroy window
     SDL_DestroyRenderer(gRenderer);
@@ -119,7 +114,6 @@ void close() {
     IMG_Quit();
     SDL_Quit();
 }
-
 
 
 
@@ -142,12 +136,15 @@ int main( int argc, char* args[] ) {
             //Event handler
             SDL_Event e;
             
-            //the dot that will be moving on the screen
-            Dot dot(150,100);
+            //the dots that will be moving on the screen
+            vector<Dot*> dotVec;
+//            Dot dot(320,470);
+//            Dot* ptr = &dot;
+//            dotVec.push_back(ptr);
             
             //The hero
-            Hero myHero(100,100);
-            myHero.getImage("Shieldmaiden/2x/idle_1.png");
+            Hero myHero(230,450);
+            myHero.getImage("assets/Shieldmaiden/4x/idle_1.png");
             
             
             //While application is running
@@ -158,18 +155,38 @@ int main( int argc, char* args[] ) {
                     if( e.key.keysym.sym == SDLK_ESCAPE ) {
                         quit = true;
                     }
-                    dot.handleEvent(e);
+                    if( e.type == SDL_MOUSEBUTTONDOWN) {
+                        dotVec.push_back(new Dot(320,470));
+                    }
+                    if (dotVec.size() != 0) (dotVec.back())->handleEvent(e);
+                    
+
                 }
-                
-                //move the dot
-                dot.move();
+                // move dots
+                int k = (int)dotVec.size();
+                for (int i = k - 1; i >= 0; i--) {
+                    if (dotVec[i]->getPosX() == 220 && dotVec[i]->getPosY() == 370) {
+                        delete dotVec[i];
+                        dotVec.erase(dotVec.begin() + i);
+                        dotVec.shrink_to_fit();
+                    }
+                }
+                for (int i = 0; i < dotVec.size(); i++) {
+                    dotVec[i]->move();
+                }
                 
                 //Clear screen
                 SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
                 SDL_RenderClear(gRenderer);
                 
-                //render objects
-                dot.render(gRenderer, gDotTexture);
+                //render dots
+                SDL_RenderCopy(gRenderer, gBG.mTexture, NULL, NULL);
+                unsigned long k1 = 0, k2 = dotVec.size();
+                cout << k2 << endl;
+                for(unsigned long i = k1; i < k2; i++) {
+                    dotVec[i]->render(gRenderer, gDotTexture);
+                }
+                //render hero
                 myHero.render(gRenderer, gHero);
                 
                 //Present

@@ -12,6 +12,8 @@ Dot::Dot(int x, int y) {
     //Initialize the offsets
     mPosX = x;
     mPosY = y;
+    mcPosX = x;
+    mcPosY = y;
     
     //Initialize the velocity
     mVelY = 0;
@@ -74,25 +76,26 @@ void Dot::move() {
     mPosX += mVelX;
     //move the dot up or down
     mPosY += mVelY;
+    if (mVelY != 0) mVelY += DOT_THROW_VEL*0.02;
     shiftColliders();
     
     //If the dot went too far
     if ( mPosX < 0 || mPosX + DOT_WIDTH > SCREEN_WIDTH) {
         //move back
         //mPosX -= mVelX;
-        mPosX = 150;
-        mPosY = 100;
+        mPosX = mcPosX - 100;
+        mPosY = mcPosY - 100;
         mVelX = 0;
         mVelY = 0;
         shiftColliders();
     }
     
     //If the dot went too far
-    if (mPosY < 0 || mPosY + DOT_HEIGHT > SCREEN_HEIGHT) {
+    if (mPosY < 0 || mPosY + DOT_HEIGHT > SCREEN_HEIGHT-50) {
         //move back
         //mPosY -= mVelY;
-        mPosX = 150;
-        mPosY = 100;
+        mPosX = mcPosX - 100;
+        mPosY = mcPosY - 100;
         mVelX = 0;
         mVelY = 0;
         shiftColliders();
@@ -102,6 +105,14 @@ void Dot::move() {
 void Dot::render(SDL_Renderer*& renderer, LTexture& dotTexture) {
     //Show the dot
     dotTexture.render (renderer, mPosX, mPosY);
+}
+
+double Dot::getPosX() {
+    return mPosX;
+}
+
+double Dot::getPosY() {
+    return mPosY;
 }
 
 void Dot::shiftColliders() {
