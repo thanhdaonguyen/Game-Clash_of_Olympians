@@ -9,15 +9,15 @@
 #define header1_hpp
 
 #include <SDL2/SDL.h>
+#include <SDL2_image/SDL_image.h>
+#include <SDL2_ttf/SDL_ttf.h>
 #include <stdio.h>
 #include <iostream>
 #include <string>
-#include <SDL2_image/SDL_image.h>
 #include <sstream>
 #include <vector>
-#include <OpenGL/glu.h>
 #include <math.h>
-#include <SDL2_ttf/SDL_ttf.h>
+
 
 //include hpp file
 

@@ -60,7 +60,7 @@ void Enemy::move() {
 }
 int Enemy::doDamage() {
     mTimer ++;
-    if (mTimer % 50 == 0) {
+    if (mTimer % 35 == 0) {
         mTimer = 0;
         return mDam;
     }
