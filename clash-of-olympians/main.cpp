@@ -167,7 +167,8 @@ void checkCollisions(vector<Dot*> dotVec, vector<Enemy*> emVec) {
         for (int j = 0; j < emVec.size(); j++) {
             if (checkRectCollisions(dotVec[i]->mColliders, emVec[j]->mColliders)) {
                 dotVec[i]->isTouched = true;
-                emVec[j]->isStop = true;
+                emVec[j]->isTouched = true;
+                break;
             }
         }
     }
@@ -192,7 +193,7 @@ int main( int argc, char* args[] ) {
             //Event handler
             SDL_Event e;
             
-            //the dots that will be moving on the screen
+            //the dots (weapons) that will be moving on the screen
             vector<Dot*> dotVec;
             
             //The hero
@@ -204,9 +205,20 @@ int main( int argc, char* args[] ) {
             SDL_Rect forcebar = {270, 430, 0, 10};
             bool forceHold = false;
             
-            //clip for goblin
-            SDL_Rect clip1 = {0, 192, 64, 64};
-            int clipcount = 0;
+            //enemys
+            vector<Enemy*> emVec;
+            Enemy gob1(1280,620,"Goblin");
+            Enemy gob2(1350,620,"Goblin");
+            Enemy gob3(1460,620,"Goblin");
+            Enemy gob4(1590,620,"Goblin");
+            Enemy gob5(1700,620,"Goblin");
+            
+            emVec.push_back(&gob1);
+            emVec.push_back(&gob2);
+            emVec.push_back(&gob3);
+            emVec.push_back(&gob4);
+            emVec.push_back(&gob5);
+            
             
             //While application is running
             while( !quit ) {
@@ -235,47 +247,60 @@ int main( int argc, char* args[] ) {
                 // force bar
                 if (forceHold && forcebar.w < 60) forcebar.w += 2;
                 
-                // move dots
+                
+                //Check the dot vector to delete redundant dots
                 int k = (int)dotVec.size();
                 for (int i = k - 1; i >= 0; i--) {
                     if (dotVec[i]->isTouched) {
+                        cout << "Touched!!!" << endl;
                         delete dotVec[i];
                         dotVec.erase(dotVec.begin() + i);
                         dotVec.shrink_to_fit();
                     }
                 }
+                
+                // move dots
                 for (int i = 0; i < dotVec.size(); i++) {
                     dotVec[i]->move();
                 }
+                
+                //move enemys
+                for (int i = 0; i < emVec.size(); i++) {
+                    emVec[i]->move();
+                }
+                
                 
                 //Clear screen
                 SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
                 SDL_RenderClear(gRenderer);
                 
-                //render dots
+                //render background
                 SDL_RenderCopy(gRenderer, gBG.mTexture, NULL, NULL);
-                unsigned long k1 = 0, k2 = dotVec.size();
-                cout << k2 << endl;
-                for(unsigned long i = k1; i < k2; i++) {
-                    dotVec[i]->render(gRenderer, gDotTexture);
-                }
+                
                 //render hero
                 myHero.render(gRenderer, gHero);
                 
+                //render dots;
+                unsigned long k1 = 0, k2 = dotVec.size();
+                for(unsigned long i = k1; i < k2; i++) {
+                    dotVec[i]->render(gRenderer, gDotTexture);
+                }
+                
+                
+                //render enemy
+                for (unsigned long i = 0; i < emVec.size(); i++) {
+                    emVec[i]->render(gRenderer, gGoblin);
+                }
+                
+                cout << endl;
+                //check collisions
+                checkCollisions(dotVec, emVec);
                 //render force bar
                 SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 0); // set color to blue
                 SDL_RenderFillRect(gRenderer, &forcebarbound); // draw filled rectangle
                 SDL_SetRenderDrawColor(gRenderer, 100, 200, 40, 0); // set color to blue
                 SDL_RenderFillRect(gRenderer, &forcebar); // draw filled rectangle
                 
-                //render enemy
-                gGoblin.render(gRenderer, 800, 600, &clip1);
-                clipcount ++;
-                if (clipcount %4 == 0) {
-                    clip1.x += 64;
-                    clipcount = 1;
-                }
-                if (clip1.x >= 704) clip1.x = 0;
                 
                 
                 //Present

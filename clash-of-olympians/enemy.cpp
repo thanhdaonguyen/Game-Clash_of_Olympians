@@ -13,7 +13,7 @@ Enemy::Enemy(int x, int y, std::string type) {
     mPosY = y;
     
     //Initialize the velocity
-    mVelX = 0;
+    mVelX = -1;
     mVelY = 0;
     
     //Initialize type
@@ -25,13 +25,14 @@ Enemy::Enemy(int x, int y, std::string type) {
         //Initialize the collision boxes's width and height
         mColliders[0].w = 64;
         mColliders[0].h = 64;
+        std::cout << mPosX << " " << mPosY << std::endl;
+        shiftColliders();
     }
     
-    //Initialize colliders relatives to position
-    shiftColliders();
 }
 
 void Enemy::move() {
+    std:: cout << "functioned" << std::endl;
     //Move the object
     mPosX += mVelX;
     mPosY += mVelY;
@@ -45,7 +46,20 @@ void Enemy::move() {
         isStop = true;
     }
     
+    if ( isTouched ) {
+        isTouched = false;
+        isStop = false;
+        mPosX = 1400;
+        mVelX = -1;
+        
+    }
 }
+
+void Enemy::render(SDL_Renderer*& renderer, LTexture& emTexture) {
+    //Show the enemy on the screen
+    emTexture.render(renderer, mPosX, mPosY, &mClip);
+}
+
 double Enemy::getPosY() {
     return mPosY;
 }
@@ -63,9 +77,9 @@ void Enemy::shiftColliders() {
     int r = 0;
     
     //Go through the object's collision boxes
-    for (int set = 0; set > mColliders.size(); set++) {
-        mColliders[set].x = mPosX;
-        mColliders[set].y = mPosY + r;
+    for (int set = 0; set < mColliders.size(); set++) {
+        mColliders[set].x = int(mPosX);
+        mColliders[set].y = int(mPosY) + r;
         
         //Move the row offset down the height of the collision box
         r += mColliders[set].h;

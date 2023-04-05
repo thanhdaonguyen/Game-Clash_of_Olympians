@@ -10,6 +10,7 @@
 
 #include <stdio.h>
 #include "header1.hpp"
+#include "LTexture.hpp"
 
 class Enemy {
 public:
@@ -26,7 +27,7 @@ public:
     //move the enemy
     void move();
     //show the enemy on
-    void render();
+    void render(SDL_Renderer*& renderer, LTexture& emTexture);
     //Get the coordinates
     double getPosX();
     double getPosY();
@@ -34,17 +35,21 @@ public:
     void setStop(double x);
     //Moves the collision boxes relative to the position
     void shiftColliders();
-    //check if the enemy approached close enough
+    //check if the enemy approached close enough or be touched
     bool isStop = false;
+    bool isTouched = false;
     //Dot's collision boxes
     std::vector<SDL_Rect> mColliders;
-    
+    //clip
+    SDL_Rect mClip = {192, 192, 64, 64};
+
 private:
     //Position of the object
     double mPosX, mPosY;
     //The position where the enemy would stop
-    double stopX;
+    double stopX = 350;
     
+        
 };
 
 #endif /* enemy_hpp */
