@@ -46,6 +46,13 @@ void Enemy::move() {
     }
     
 }
+double Enemy::getPosY() {
+    return mPosY;
+}
+
+double Enemy::getPosX() {
+    return mPosX;
+}
 
 void Enemy::setStop(double x) {
     stopX = x;

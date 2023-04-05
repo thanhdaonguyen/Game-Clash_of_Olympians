@@ -36,7 +36,8 @@ public:
     void shiftColliders();
     //check if the enemy approached close enough
     bool isStop = false;
-    
+    //Dot's collision boxes
+    std::vector<SDL_Rect> mColliders;
     
 private:
     //Position of the object
@@ -44,8 +45,6 @@ private:
     //The position where the enemy would stop
     double stopX;
     
-    //Dot's collision boxes
-    std::vector<SDL_Rect> mColliders;
 };
 
 #endif /* enemy_hpp */

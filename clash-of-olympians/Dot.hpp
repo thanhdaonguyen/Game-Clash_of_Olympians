@@ -45,6 +45,8 @@ public:
     
     bool isTouched = false;
 
+    //Dot's collision boxes
+    std::vector<SDL_Rect> mColliders;
     //Get the collision boxes
     std::vector<SDL_Rect>& getColliders();
     
@@ -58,9 +60,6 @@ private:
     //The velocity acording to coordinates of the dot
     double mVelX, mVelY;
     
-    
-    //Dot's collision boxes
-    std::vector<SDL_Rect> mColliders;
     
     //Moves the collision boxes relative to the dot's position
     void shiftColliders();
