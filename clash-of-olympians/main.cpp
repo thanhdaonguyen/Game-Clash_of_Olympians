@@ -34,7 +34,8 @@ LTexture gDotTexture(gRenderer);
 LTexture gHero(gRenderer);
 LTexture gBG(gRenderer);
 LTexture gGoblin(gRenderer);
-LTexture gTextTexture(gRenderer);
+LTexture gHPTexture(gRenderer);
+LTexture gScore(gRenderer);
 TTF_Font* gFont = NULL;
 
 
@@ -125,7 +126,8 @@ void close() {
     gHero.free();
     gBG.free();
     gGoblin.free();
-    gTextTexture.free();
+    gHPTexture.free();
+    gScore.free();
     
     //Free global font
     TTF_CloseFont( gFont );
@@ -238,8 +240,8 @@ int main( int argc, char* args[] ) {
             emVec.push_back(&gob4);
             emVec.push_back(&gob5);
             
-            //the score
-            int score = 100;
+            //the HP
+            int HP = 100;
             SDL_Color scoreTextColor = { 0, 0, 0 };
             
             //While application is running
@@ -294,7 +296,7 @@ int main( int argc, char* args[] ) {
                 //deal damage
                 for (int i = 0; i < emVec.size(); i++) {
                     if (emVec[i]->isStop) {
-                        score -= emVec[i]->doDamage();
+                        HP -= emVec[i]->doDamage();
                     }
                 }
                 
@@ -330,16 +332,26 @@ int main( int argc, char* args[] ) {
                 SDL_SetRenderDrawColor(gRenderer, 100, 200, 40, 0); // set color to blue
                 SDL_RenderFillRect(gRenderer, &forcebar); // draw filled rectangle
                 
+                //Render HP to the screen
+                gHPTexture.loadFromRenderedText(gRenderer, gFont, "Your HP: " + to_string(HP), scoreTextColor);
+                gHPTexture.render(gRenderer, 200, 200);
                 //Render score to the screen
-                gTextTexture.loadFromRenderedText(gRenderer, gFont, "Your HP: " + to_string(score), scoreTextColor);
-                
-                gTextTexture.render(gRenderer, 200, 200);
-
-                
+                gScore.loadFromRenderedText(gRenderer, gFont, "Your score: " + to_string(int(SDL_GetTicks()/1000)), scoreTextColor);
+                gScore.render(gRenderer, 200, 250);
                 //Present
                 SDL_RenderPresent(gRenderer);
                 
-                cout << score << endl;
+                //end game
+                if (HP < 0) {
+                    SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
+                    SDL_RenderClear(gRenderer);
+                    gScore.loadFromRenderedText(gRenderer, gFont, "YOU LOSE!", scoreTextColor);
+                    gScore.render(gRenderer, (SCREEN_WIDTH/2 - gScore.getWidth()/2), 250);
+                    SDL_RenderPresent(gRenderer);
+                    SDL_Delay(3000);
+                    
+                    quit = true;
+                }
             }
         }
     }
