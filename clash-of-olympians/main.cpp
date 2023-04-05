@@ -32,6 +32,7 @@ SDL_Renderer* gRenderer = NULL;
 LTexture gDotTexture(gRenderer);
 LTexture gHero(gRenderer);
 LTexture gBG(gRenderer);
+LTexture gGoblin(gRenderer);
 
 
 
@@ -94,6 +95,12 @@ bool loadMedia() {
         success = false;
     }
     
+    if(!gGoblin.loadFromFile(gRenderer,"assets/goblin/goblinsword.png")) {
+        printf ("Failed to load gobin image");
+        success = false;
+    }
+    
+    
     return success;
 }
 
@@ -103,6 +110,7 @@ void close() {
     gDotTexture.free();
     gHero.free();
     gBG.free();
+    gGoblin.free();
 
     //destroy window
     SDL_DestroyRenderer(gRenderer);
@@ -144,9 +152,13 @@ int main( int argc, char* args[] ) {
             myHero.getImage("assets/Shieldmaiden/4x/idle_1.png");
             
             //The force bar
+            SDL_Rect forcebarbound ={268, 428, 64, 14};
             SDL_Rect forcebar = {270, 430, 0, 10};
             bool forceHold = false;
             
+            //clip for goblin
+            SDL_Rect clip1 = {0, 192, 64, 64};
+            int clipcount = 0;
             
             //While application is running
             while( !quit ) {
@@ -163,7 +175,7 @@ int main( int argc, char* args[] ) {
                     
                     if( e.type == SDL_MOUSEBUTTONUP) {
                         forceHold = false;
-                        dotVec.back()->mVel = dotVec.back()->DOT_THROW_VEL*double(forcebar.w)/60;
+                        dotVec.back()->mVel = dotVec.back()->DOT_THROW_VEL*double(forcebar.w + 9)/60;
                         forcebar.w = 0;
                     }
                     
@@ -173,7 +185,7 @@ int main( int argc, char* args[] ) {
 
                 }
                 // force bar
-                if (forceHold && forcebar.w < 60) forcebar.w += 1;
+                if (forceHold && forcebar.w < 60) forcebar.w += 2;
                 
                 // move dots
                 int k = (int)dotVec.size();
@@ -203,8 +215,20 @@ int main( int argc, char* args[] ) {
                 myHero.render(gRenderer, gHero);
                 
                 //render force bar
+                SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 0); // set color to blue
+                SDL_RenderFillRect(gRenderer, &forcebarbound); // draw filled rectangle
                 SDL_SetRenderDrawColor(gRenderer, 100, 200, 40, 0); // set color to blue
                 SDL_RenderFillRect(gRenderer, &forcebar); // draw filled rectangle
+                
+                //render enemy
+                gGoblin.render(gRenderer, 800, 600, &clip1);
+                clipcount ++;
+                if (clipcount %4 == 0) {
+                    clip1.x += 64;
+                    clipcount = 1;
+                }
+                if (clip1.x >= 704) clip1.x = 0;
+                
                 
                 //Present
                 SDL_RenderPresent(gRenderer);

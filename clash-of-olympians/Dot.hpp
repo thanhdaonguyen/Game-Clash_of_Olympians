@@ -25,9 +25,7 @@ public:
     //the screen 
     const int SCREEN_WIDTH = 1200;
     const int SCREEN_HEIGHT = 700;
-    
-    //Maximum axis velocity of the dot
-    static const int DOT_VEL = 3;
+
     
     //Initializes the variables
     Dot(int x, int y);

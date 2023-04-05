@@ -87,7 +87,7 @@ void Dot::move() {
     }
     
     //If the dot went too far
-    if (mPosY < 0 || mPosY + DOT_HEIGHT > SCREEN_HEIGHT-50) {
+    if (mPosY < 0 || mPosY + DOT_HEIGHT > SCREEN_HEIGHT - 40) {
         //move back
         isTouched = true;
     }
