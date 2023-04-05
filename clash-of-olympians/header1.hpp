@@ -17,7 +17,7 @@
 #include <vector>
 #include <OpenGL/glu.h>
 #include <math.h>
-
+#include <SDL2_ttf/SDL_ttf.h>
 
 //include hpp file
 

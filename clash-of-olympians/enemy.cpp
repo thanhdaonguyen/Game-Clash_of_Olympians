@@ -11,9 +11,13 @@ Enemy::Enemy(int x, int y, std::string type) {
     //Initialize the coordinates
     mPosX = x;
     mPosY = y;
+    //Set dam
+    if (type == "Goblin") {
+        mDam = 7;
+    }
     
     //Initialize the velocity
-    mVelX = -1;
+    mVelX = -3;
     mVelY = 0;
     
     //Initialize type
@@ -32,7 +36,6 @@ Enemy::Enemy(int x, int y, std::string type) {
 }
 
 void Enemy::move() {
-    std:: cout << "functioned" << std::endl;
     //Move the object
     mPosX += mVelX;
     mPosY += mVelY;
@@ -50,11 +53,19 @@ void Enemy::move() {
         isTouched = false;
         isStop = false;
         mPosX = 1400;
-        mVelX = -1;
+        mVelX = -3;
+        mTimer = 0;
         
     }
 }
-
+int Enemy::doDamage() {
+    mTimer ++;
+    if (mTimer % 50 == 0) {
+        mTimer = 0;
+        return mDam;
+    }
+    return 0;
+}
 void Enemy::render(SDL_Renderer*& renderer, LTexture& emTexture) {
     //Show the enemy on the screen
     emTexture.render(renderer, mPosX, mPosY, &mClip);

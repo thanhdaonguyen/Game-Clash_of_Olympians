@@ -34,6 +34,8 @@ LTexture gDotTexture(gRenderer);
 LTexture gHero(gRenderer);
 LTexture gBG(gRenderer);
 LTexture gGoblin(gRenderer);
+LTexture gTextTexture(gRenderer);
+TTF_Font* gFont = NULL;
 
 
 
@@ -76,6 +78,13 @@ bool init() {
                     printf("Renderer could not be created! SDL_image Error: %s\n", IMG_GetError());
                     success = false;
                 }
+                
+                //Initialize SDL_ttf
+                if( TTF_Init() == -1 ) {
+                    printf( "SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError() );
+                    success = false;
+                }
+
             }
         }
     }
@@ -100,8 +109,12 @@ bool loadMedia() {
         printf ("Failed to load gobin image");
         success = false;
     }
-    
-    
+    //Open the font
+    gFont = TTF_OpenFont( "assets/16_true_type_fonts/lazy.ttf", 28 );
+    if( gFont == NULL ) {
+        printf( "Failed to load lazy font! SDL_ttf Error: %s\n", TTF_GetError() );
+        success = false;
+    }
     return success;
 }
 
@@ -112,6 +125,12 @@ void close() {
     gHero.free();
     gBG.free();
     gGoblin.free();
+    gTextTexture.free();
+    
+    //Free global font
+    TTF_CloseFont( gFont );
+    gFont = NULL;
+    
 
     //destroy window
     SDL_DestroyRenderer(gRenderer);
@@ -219,6 +238,9 @@ int main( int argc, char* args[] ) {
             emVec.push_back(&gob4);
             emVec.push_back(&gob5);
             
+            //the score
+            int score = 100;
+            SDL_Color scoreTextColor = { 0, 0, 0 };
             
             //While application is running
             while( !quit ) {
@@ -269,6 +291,13 @@ int main( int argc, char* args[] ) {
                     emVec[i]->move();
                 }
                 
+                //deal damage
+                for (int i = 0; i < emVec.size(); i++) {
+                    if (emVec[i]->isStop) {
+                        score -= emVec[i]->doDamage();
+                    }
+                }
+                
                 
                 //Clear screen
                 SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
@@ -301,12 +330,16 @@ int main( int argc, char* args[] ) {
                 SDL_SetRenderDrawColor(gRenderer, 100, 200, 40, 0); // set color to blue
                 SDL_RenderFillRect(gRenderer, &forcebar); // draw filled rectangle
                 
+                //Render score to the screen
+                gTextTexture.loadFromRenderedText(gRenderer, gFont, "Your HP: " + to_string(score), scoreTextColor);
                 
+                gTextTexture.render(gRenderer, 200, 200);
+
                 
                 //Present
                 SDL_RenderPresent(gRenderer);
                 
-                
+                cout << score << endl;
             }
         }
     }

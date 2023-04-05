@@ -18,7 +18,9 @@ public:
     double mVelX;
     double mVelY;
     //the damage of the enemy
-    double dam;
+    int mDam;
+    //timer to check if it do damage
+    int mTimer = 0;
     //the type of the enemy
     std::string mType;
     
@@ -26,6 +28,8 @@ public:
     Enemy (int x, int y, std::string type);
     //move the enemy
     void move();
+    //deal damage to the tower
+    int doDamage();
     //show the enemy on
     void render(SDL_Renderer*& renderer, LTexture& emTexture);
     //Get the coordinates

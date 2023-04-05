@@ -24,7 +24,7 @@ public:
     bool loadFromFile(SDL_Renderer*& aRenderer, std::string path );
 
     //Create image from font string
-    bool loadFromRenderedText (std::string text, SDL_Color textcolor);
+    bool loadFromRenderedText (SDL_Renderer*& renderer, TTF_Font*& gFont, std::string textureText, SDL_Color textColor);
 
     //Deallocates texture
     void free();
@@ -43,7 +43,7 @@ public:
 
     //Get image dimensions
     int getWidth();
-    int getHeigt();
+    int getHeight();
     
     //The actual hardware texture
     SDL_Texture* mTexture = NULL;
