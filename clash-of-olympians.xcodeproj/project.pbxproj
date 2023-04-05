@@ -38,7 +38,7 @@
 		B807FF3C29DBC2AE00FA21C4 /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; path = assets; sourceTree = "<group>"; };
 		B807FF3D29DBCAF200FA21C4 /* enemy.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = enemy.cpp; sourceTree = "<group>"; };
 		B807FF3E29DBCAF200FA21C4 /* enemy.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = enemy.hpp; sourceTree = "<group>"; };
-		B894F70B29DBC0D80026553A /* clash-of-olympians */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "clash-of-olympians"; sourceTree = BUILT_PRODUCTS_DIR; };
+		B894F70B29DBC0D80026553A /* clash-of-olympians */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "compiled.mach-o.corefile"; path = "clash-of-olympians"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B894F70E29DBC0D80026553A /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		B894F71529DBC13D0026553A /* Hero.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Hero.hpp; sourceTree = "<group>"; };
 		B894F71629DBC13D0026553A /* Dot.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Dot.cpp; sourceTree = "<group>"; };
