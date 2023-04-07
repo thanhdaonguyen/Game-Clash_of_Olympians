@@ -8,17 +8,24 @@
 #include "Hero.hpp"
 
 //Hero functions
-Hero::Hero(int x, int y) {
+Hero::Hero(int x, int y, SDL_Renderer*& renderer, std::string img) {
     //get the hero's position
     hPosX = x;
     hPosY = y;
+    
+    //Set mLTexture
+    mLTexture = new LTexture;
+    mLTexture->loadFromFile(renderer, img);
+    
+    //Set renderer
+    mRenderer = renderer;
+}
+Hero::~Hero() {
+    delete mLTexture;
 }
 
-void Hero::render(SDL_Renderer*& renderer, LTexture& heroTexture) {
-    heroTexture.render(renderer, hPosX, hPosY);
-    heroTexture.loadFromFile(renderer,hTexture);
+
+void Hero::render() {
+    mLTexture->render(mRenderer, hPosX, hPosY);
 };
 
-void Hero::getImage(std::string path) {
-    hTexture = path;
-}

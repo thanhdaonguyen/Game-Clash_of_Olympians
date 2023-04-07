@@ -27,8 +27,11 @@ public:
     const int SCREEN_HEIGHT = 700;
 
     
-    //Initializes the variables
-    Dot(int x, int y);
+    //Constructor
+    Dot(int x, int y, SDL_Renderer*& renderer, std::string img);
+    
+    //Destructor
+    ~Dot();
     
     //Takes key presses and adjusts the dot's velocity
     void handleEvent(SDL_Event& e);
@@ -37,7 +40,7 @@ public:
     void move();
     
     //Shows the dot on the screen
-    void render(SDL_Renderer*& renderer, LTexture& dotTexture);
+    void render();
     
     double getPosX();
     
@@ -60,9 +63,11 @@ private:
     //The velocity acording to coordinates of the dot
     double mVelX, mVelY;
     
-    
     //Moves the collision boxes relative to the dot's position
     void shiftColliders();
+    
+    LTexture* mLTexture = NULL;
+    SDL_Renderer* mRenderer = NULL;
 };
 
 

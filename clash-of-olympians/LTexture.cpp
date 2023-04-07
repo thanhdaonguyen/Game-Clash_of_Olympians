@@ -6,10 +6,17 @@
 //
 
 #include "LTexture.hpp"
-
+using namespace std;
 //Ltexture's functions
-LTexture::LTexture(SDL_Renderer*& renderer) {
+LTexture::LTexture(SDL_Renderer*& renderer, std::string path) {
     //Initialize
+    mTexture = NULL;
+    mWidth = 0;
+    mHeight = 0;
+    loadFromFile(renderer, path);
+}
+
+LTexture::LTexture() {
     mTexture = NULL;
     mWidth = 0;
     mHeight = 0;
@@ -31,7 +38,10 @@ bool LTexture::loadFromFile(SDL_Renderer*& aRenderer, std:: string path ) {
     //Load image at specified path
     SDL_Surface* loadedSurface = IMG_Load(path.c_str());
     if( loadedSurface == NULL ) {
-        printf( "Unable to load image from %s. Error: %s\n", path.c_str(), IMG_GetError() );
+        if (path != "") {
+            printf( "Unable to load image from %s. Error: %s\n", path.c_str(), IMG_GetError() );
+            cout << endl;
+        }
     }
     else {
         // Color key image
@@ -41,6 +51,7 @@ bool LTexture::loadFromFile(SDL_Renderer*& aRenderer, std:: string path ) {
         newTexture = SDL_CreateTextureFromSurface(aRenderer, loadedSurface);
         if( newTexture == NULL) {
             printf("Unable to create texture from surface %s, SDL_Error: %s", path.c_str(), SDL_GetError());
+            cout << endl;
         }
         else {
             //Get image dimensions
@@ -66,6 +77,7 @@ bool LTexture::loadFromRenderedText(SDL_Renderer*& renderer, TTF_Font*& gFont, s
     if( textSurface == NULL )
     {
         printf( "Unable to render text surface! SDL_ttf Error: %s\n", TTF_GetError() );
+        cout << endl;
     }
     else
     {
@@ -74,6 +86,7 @@ bool LTexture::loadFromRenderedText(SDL_Renderer*& renderer, TTF_Font*& gFont, s
         if( mTexture == NULL )
         {
             printf( "Unable to create texture from rendered text! SDL Error: %s\n", SDL_GetError() );
+            cout << endl;
         }
         else
         {

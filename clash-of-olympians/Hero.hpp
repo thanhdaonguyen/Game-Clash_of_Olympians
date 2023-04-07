@@ -14,26 +14,25 @@ class Hero {
     
 public:
     
-    //Initialize the hero
-    Hero(int x, int y);
-    
+    //Constructor
+    Hero(int x, int y, SDL_Renderer*& renderer, std::string img);
+    //Destructor
+    ~Hero();
 //    //Takes key presses and adjust state
 //    void handleEvent(SDL_Event& e);
     
-    //Get the heroimage
-    void getImage(std::string path);
-    
     //Show the hero on the screen
-    void render(SDL_Renderer*& renderer, LTexture& heroTexture);
+    void render();
     
 private:
-    //texture that contain of the hero
-    std::string hTexture;
+    
     
     //image's positions
     int hPosX;
     int hPosY;
     
+    LTexture* mLTexture = NULL;
+    SDL_Renderer* mRenderer = NULL;
 };
 
 

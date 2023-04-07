@@ -8,7 +8,7 @@
 #include "Dot.hpp"
 
 //Dot functions
-Dot::Dot(int x, int y) {
+Dot::Dot(int x, int y, SDL_Renderer*& renderer, std::string img) {
     //Initialize the offsets
     mPosX = x;
     mPosY = y;
@@ -18,6 +18,12 @@ Dot::Dot(int x, int y) {
     //Initialize the velocity
     mVelY = 0;
     mVelX = 0;
+    
+    //Initialize mLTexture
+    mLTexture = new LTexture;
+    mLTexture->loadFromFile(renderer, img);
+    //Initialize mRenderer
+    mRenderer = renderer;
     
     //Create the necessary SDL_Rects;
     mColliders.resize(11);
@@ -60,6 +66,10 @@ Dot::Dot(int x, int y) {
     shiftColliders();
 }
 
+Dot::~Dot() {
+    delete mLTexture;
+}
+
 void Dot::handleEvent(SDL_Event &e) {
     //If mouse was pressed
     if (e.type == SDL_MOUSEBUTTONUP) {
@@ -93,9 +103,9 @@ void Dot::move() {
     }
 }
 
-void Dot::render(SDL_Renderer*& renderer, LTexture& dotTexture) {
+void Dot::render() {
     //Show the dot
-    dotTexture.render (renderer, mPosX, mPosY);
+    mLTexture->render (mRenderer, mPosX, mPosY);
 }
 
 double Dot::getPosX() {

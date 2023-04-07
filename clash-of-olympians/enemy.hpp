@@ -25,13 +25,15 @@ public:
     std::string mType;
     
     //Constructor
-    Enemy (int x, int y, std::string type);
+    Enemy (int x, int y, SDL_Renderer*& renderer, std::string type, std::string img);
+    //Destructor
+    ~Enemy();
     //move the enemy
     void move();
     //deal damage to the tower
     int doDamage();
     //show the enemy on
-    void render(SDL_Renderer*& renderer, LTexture& emTexture);
+    void render();
     //Get the coordinates
     double getPosX();
     double getPosY();
@@ -45,13 +47,17 @@ public:
     //Dot's collision boxes
     std::vector<SDL_Rect> mColliders;
     //clip
-    SDL_Rect mClip = {192, 192, 64, 64};
+    SDL_Rect mClip;
 
 private:
     //Position of the object
     double mPosX, mPosY;
     //The position where the enemy would stop
     double stopX = 350;
+    //LTexture of the object
+    LTexture* mLTexture = NULL;
+    //renderer of the object
+    SDL_Renderer* mRenderer = NULL;
     
         
 };

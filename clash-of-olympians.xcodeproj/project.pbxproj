@@ -11,11 +11,12 @@
 		B807FF3929DBC26800FA21C4 /* SDL2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B807FF3529DBC26800FA21C4 /* SDL2.framework */; };
 		B807FF3A29DBC26800FA21C4 /* SDL2_ttf.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B807FF3629DBC26800FA21C4 /* SDL2_ttf.framework */; };
 		B807FF3B29DBC26800FA21C4 /* SDL2_mixer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B807FF3729DBC26800FA21C4 /* SDL2_mixer.framework */; };
-		B807FF3F29DBCAF200FA21C4 /* enemy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B807FF3D29DBCAF200FA21C4 /* enemy.cpp */; };
-		B894F70F29DBC0D80026553A /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B894F70E29DBC0D80026553A /* main.cpp */; };
-		B894F71C29DBC13D0026553A /* Dot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B894F71629DBC13D0026553A /* Dot.cpp */; };
-		B894F71D29DBC13D0026553A /* LTexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B894F71829DBC13D0026553A /* LTexture.cpp */; };
-		B894F71E29DBC13D0026553A /* Hero.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B894F71929DBC13D0026553A /* Hero.cpp */; };
+		B8F7B4F229DFA18D007E33BE /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B8F7B4ED29DFA18D007E33BE /* main.cpp */; };
+		B8F7B4F329DFA18D007E33BE /* enemy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B8F7B4EE29DFA18D007E33BE /* enemy.cpp */; };
+		B8F7B4F429DFA18D007E33BE /* Hero.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B8F7B4EF29DFA18D007E33BE /* Hero.cpp */; };
+		B8F7B4F529DFA18D007E33BE /* Dot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B8F7B4F029DFA18D007E33BE /* Dot.cpp */; };
+		B8F7B4F629DFA18D007E33BE /* LTexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B8F7B4F129DFA18D007E33BE /* LTexture.cpp */; };
+		B8F7B4F929DFBEA0007E33BE /* SDLApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B8F7B4F729DFBEA0007E33BE /* SDLApp.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -36,17 +37,19 @@
 		B807FF3629DBC26800FA21C4 /* SDL2_ttf.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2_ttf.framework; path = ../../../../../../Library/Frameworks/SDL2_ttf.framework; sourceTree = "<group>"; };
 		B807FF3729DBC26800FA21C4 /* SDL2_mixer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2_mixer.framework; path = ../../../../../../Library/Frameworks/SDL2_mixer.framework; sourceTree = "<group>"; };
 		B807FF3C29DBC2AE00FA21C4 /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; path = assets; sourceTree = "<group>"; };
-		B807FF3D29DBCAF200FA21C4 /* enemy.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = enemy.cpp; sourceTree = "<group>"; };
 		B807FF3E29DBCAF200FA21C4 /* enemy.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = enemy.hpp; sourceTree = "<group>"; };
 		B894F70B29DBC0D80026553A /* clash-of-olympians */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "compiled.mach-o.corefile"; path = "clash-of-olympians"; sourceTree = BUILT_PRODUCTS_DIR; };
-		B894F70E29DBC0D80026553A /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		B894F71529DBC13D0026553A /* Hero.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Hero.hpp; sourceTree = "<group>"; };
-		B894F71629DBC13D0026553A /* Dot.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Dot.cpp; sourceTree = "<group>"; };
 		B894F71729DBC13D0026553A /* LTexture.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = LTexture.hpp; sourceTree = "<group>"; };
-		B894F71829DBC13D0026553A /* LTexture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LTexture.cpp; sourceTree = "<group>"; };
-		B894F71929DBC13D0026553A /* Hero.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Hero.cpp; sourceTree = "<group>"; };
 		B894F71A29DBC13D0026553A /* Dot.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Dot.hpp; sourceTree = "<group>"; };
 		B894F71B29DBC13D0026553A /* header1.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = header1.hpp; sourceTree = "<group>"; };
+		B8F7B4ED29DFA18D007E33BE /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		B8F7B4EE29DFA18D007E33BE /* enemy.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = enemy.cpp; sourceTree = "<group>"; };
+		B8F7B4EF29DFA18D007E33BE /* Hero.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Hero.cpp; sourceTree = "<group>"; };
+		B8F7B4F029DFA18D007E33BE /* Dot.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Dot.cpp; sourceTree = "<group>"; };
+		B8F7B4F129DFA18D007E33BE /* LTexture.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = LTexture.cpp; sourceTree = "<group>"; };
+		B8F7B4F729DFBEA0007E33BE /* SDLApp.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SDLApp.cpp; sourceTree = "<group>"; };
+		B8F7B4F829DFBEA0007E33BE /* SDLApp.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = SDLApp.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -85,16 +88,18 @@
 			isa = PBXGroup;
 			children = (
 				B807FF3C29DBC2AE00FA21C4 /* assets */,
-				B894F71629DBC13D0026553A /* Dot.cpp */,
+				B8F7B4F029DFA18D007E33BE /* Dot.cpp */,
+				B8F7B4EE29DFA18D007E33BE /* enemy.cpp */,
+				B8F7B4EF29DFA18D007E33BE /* Hero.cpp */,
+				B8F7B4F129DFA18D007E33BE /* LTexture.cpp */,
+				B8F7B4ED29DFA18D007E33BE /* main.cpp */,
+				B8F7B4F729DFBEA0007E33BE /* SDLApp.cpp */,
 				B894F71A29DBC13D0026553A /* Dot.hpp */,
 				B894F71B29DBC13D0026553A /* header1.hpp */,
-				B894F71929DBC13D0026553A /* Hero.cpp */,
 				B894F71529DBC13D0026553A /* Hero.hpp */,
-				B894F71829DBC13D0026553A /* LTexture.cpp */,
 				B894F71729DBC13D0026553A /* LTexture.hpp */,
-				B894F70E29DBC0D80026553A /* main.cpp */,
-				B807FF3D29DBCAF200FA21C4 /* enemy.cpp */,
 				B807FF3E29DBCAF200FA21C4 /* enemy.hpp */,
+				B8F7B4F829DFBEA0007E33BE /* SDLApp.hpp */,
 			);
 			path = "clash-of-olympians";
 			sourceTree = "<group>";
@@ -167,11 +172,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B807FF3F29DBCAF200FA21C4 /* enemy.cpp in Sources */,
-				B894F70F29DBC0D80026553A /* main.cpp in Sources */,
-				B894F71C29DBC13D0026553A /* Dot.cpp in Sources */,
-				B894F71D29DBC13D0026553A /* LTexture.cpp in Sources */,
-				B894F71E29DBC13D0026553A /* Hero.cpp in Sources */,
+				B8F7B4F229DFA18D007E33BE /* main.cpp in Sources */,
+				B8F7B4F929DFBEA0007E33BE /* SDLApp.cpp in Sources */,
+				B8F7B4F329DFA18D007E33BE /* enemy.cpp in Sources */,
+				B8F7B4F429DFA18D007E33BE /* Hero.cpp in Sources */,
+				B8F7B4F529DFA18D007E33BE /* Dot.cpp in Sources */,
+				B8F7B4F629DFA18D007E33BE /* LTexture.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

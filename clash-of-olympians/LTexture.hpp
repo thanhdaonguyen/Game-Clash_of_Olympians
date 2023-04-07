@@ -15,8 +15,8 @@
 class LTexture {
 public:
     //Initializes variables
-    LTexture(SDL_Renderer*& renderer);
-
+    LTexture(SDL_Renderer*& renderer, std::string path = "");
+    LTexture();
     //Deallocates memory
     ~LTexture();
 

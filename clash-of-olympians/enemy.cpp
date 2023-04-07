@@ -7,13 +7,27 @@
 
 #include "enemy.hpp"
 
-Enemy::Enemy(int x, int y, std::string type) {
+using namespace std;
+
+Enemy::Enemy(int x, int y, SDL_Renderer*& renderer, std::string type, std::string img) {
+    
+    //Initialize the mRenderer
+    mRenderer = renderer;
+    cout << mRenderer << endl;
+    cout << renderer << endl;
+    //Initialize the mLTexture
+    mLTexture = new LTexture();
+    mLTexture->loadFromFile(renderer, img);
+    
     //Initialize the coordinates
     mPosX = x;
     mPosY = y;
     //Set dam
     if (type == "Goblin") {
         mDam = 7;
+    }
+    if (type == "Flydemon") {
+        mDam = 5;
     }
     
     //Initialize the velocity
@@ -24,15 +38,31 @@ Enemy::Enemy(int x, int y, std::string type) {
     mType = type;
     
     if (type == "Goblin") {
+        mClip = {192, 192, 64, 64};
         //Create the necessary SDL_Rects
         mColliders.resize(1);
         //Initialize the collision boxes's width and height
         mColliders[0].w = 64;
         mColliders[0].h = 64;
-        std::cout << mPosX << " " << mPosY << std::endl;
+        
+        shiftColliders();
+    }
+    if (type == "Flydemon") {
+        mClip = {192, 0, 64, 64};
+        //Create the necessary SDL_Rects
+        mColliders.resize(1);
+        //Initialize the collision boxes's width and height
+        mColliders[0].w = 64;
+        mColliders[0].h = 64;
+        
         shiftColliders();
     }
     
+    
+}
+
+Enemy::~Enemy() {
+    delete mLTexture;
 }
 
 void Enemy::move() {
@@ -52,8 +82,15 @@ void Enemy::move() {
     if ( isTouched ) {
         isTouched = false;
         isStop = false;
-        mPosX = 1400;
-        mVelX = -3;
+        if (mType == "Goblin") {
+            mPosX = 1400;
+            mVelX = -3;
+        }
+        if (mType == "Flydemon") {
+            mPosX = 1400;
+            mPosY = rand() % (400 - 200 + 1) + 200;
+            mVelX = -3;
+        }
         mTimer = 0;
         
     }
@@ -66,9 +103,9 @@ int Enemy::doDamage() {
     }
     return 0;
 }
-void Enemy::render(SDL_Renderer*& renderer, LTexture& emTexture) {
+void Enemy::render() {
     //Show the enemy on the screen
-    emTexture.render(renderer, mPosX, mPosY, &mClip);
+    mLTexture->render(mRenderer, mPosX, mPosY, &mClip);
 }
 
 double Enemy::getPosY() {
