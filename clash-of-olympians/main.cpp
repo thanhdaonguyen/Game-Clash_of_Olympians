@@ -76,19 +76,12 @@ void checkCollisions(vector<Dot*> dotVec, vector<Enemy*> emVec) {
     }
 }
 
-////The window we'll be rendering to
-//SDL_Window* gWindow = gWindow = SDL_CreateWindow( "Clash of Olympians", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );;
-//
-////The window renderer
-//SDL_Renderer* gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-
 //Scene textures
-LTexture gBG(app->mRenderer,"assets/background.png");
-LTexture gHPTexture(app->mRenderer);
-LTexture gScore(app->mRenderer);
+LTexture gBG(app->GetRenderer(),"assets/background.png");
+LTexture gHPTexture(app->GetRenderer());
+LTexture gScore(app->GetRenderer());
 
-TTF_Font* gFont = NULL;
-
+TTF_Font* gFont = TTF_OpenFont( "assets/16_true_type_fonts/lazy.ttf", 28 );
 
 
 //##############################
@@ -97,16 +90,16 @@ TTF_Font* gFont = NULL;
 //Event handler
 SDL_Event e;
 //The hero
-Hero myHero(230,450,app->mRenderer,"assets/Shieldmaiden/4x/idle_1.png");
+Hero myHero(230,450,app->GetRenderer(),"assets/Shieldmaiden/4x/idle_1.png");
 //the dots (weapons) that will be moving on the screen
 vector<Dot*> dotVec;
 //enemys
 vector<Enemy*> emVec;
-Enemy gob1(1280,620,app->mRenderer,"Goblin","assets/goblin/goblinsword.png");
-Enemy gob2(1350,620,app->mRenderer,"Goblin","assets/goblin/goblinsword.png");
-Enemy gob3(1460,620,app->mRenderer,"Goblin","assets/goblin/goblinsword.png");
-Enemy fly1(1590,250,app->mRenderer,"Flydemon","assets/flyingdemon.png");
-Enemy fly2(1700,300,app->mRenderer,"Flydemon","assets/flyingdemon.png");
+Enemy gob1(1280,620,app->GetRenderer(),"Goblin","assets/goblin/goblinsword.png");
+Enemy gob2(1350,620,app->GetRenderer(),"Goblin","assets/goblin/goblinsword.png");
+Enemy gob3(1460,620,app->GetRenderer(),"Goblin","assets/goblin/goblinsword.png");
+Enemy fly1(1590,250,app->GetRenderer(),"Flydemon","assets/flyingdemon.png");
+Enemy fly2(1700,300,app->GetRenderer(),"Flydemon","assets/flyingdemon.png");
 
 void addToemVec() {
     emVec.push_back(&gob1);
@@ -138,7 +131,7 @@ void HandleEvent () {
             app->EndAppLoop();
         }
         if( e.type == SDL_MOUSEBUTTONDOWN) {
-            dotVec.push_back(new Dot(320,470,app->mRenderer,"assets/26_motion/dot.bmp"));
+            dotVec.push_back(new Dot(320,470,app->GetRenderer(),"assets/26_motion/dot.bmp"));
             forceHold = true;
         }
 
@@ -189,16 +182,14 @@ void HandleEvent () {
     
 }
 
-
-
 //HANDLE ALL RENDERINGS
 void HandleRendering () {
     //Clear screen
-    SDL_SetRenderDrawColor(app->mRenderer, 255, 255, 255, 255);
-    SDL_RenderClear(app->mRenderer);
+    SDL_SetRenderDrawColor(app->GetRenderer(), 255, 255, 255, 255);
+    SDL_RenderClear(app->GetRenderer());
 
     //render background
-    SDL_RenderCopy(app->mRenderer, gBG.mTexture, NULL, NULL);
+    SDL_RenderCopy(app->GetRenderer(), gBG.mTexture, NULL, NULL);
     //render hero
     myHero.render();
     //render dots;
@@ -211,51 +202,32 @@ void HandleRendering () {
             emVec[i]->render();
     }
     //render force bar
-    SDL_SetRenderDrawColor(app->mRenderer, 255, 255, 255, 0); // set color to blue
-    SDL_RenderFillRect(app->mRenderer, &forcebarbound); // draw filled rectangle
-    SDL_SetRenderDrawColor(app->mRenderer, 100, 200, 40, 0); // set color to blue
-    SDL_RenderFillRect(app->mRenderer, &forcebar); // draw filled rectangle
+    SDL_SetRenderDrawColor(app->GetRenderer(), 255, 255, 255, 0); // set color to blue
+    SDL_RenderFillRect(app->GetRenderer(), &forcebarbound); // draw filled rectangle
+    SDL_SetRenderDrawColor(app->GetRenderer(), 100, 200, 40, 0); // set color to blue
+    SDL_RenderFillRect(app->GetRenderer(), &forcebar); // draw filled rectangle
 
     //Render HP to the screen
-    gHPTexture.loadFromRenderedText(app->mRenderer, gFont, "Your HP: " + to_string(HP), scoreTextColor);
-    gHPTexture.render(app->mRenderer, 200, 200);
+    gHPTexture.loadFromRenderedText(app->GetRenderer(), gFont, "Your HP: " + to_string(HP), scoreTextColor);
+    gHPTexture.render(app->GetRenderer(), 200, 200);
     //Render score to the screen
-    gScore.loadFromRenderedText(app->mRenderer, gFont, "Your score: " + to_string(int(SDL_GetTicks()/1000)), scoreTextColor);
-    gScore.render(app->mRenderer, 200, 250);
+    gScore.loadFromRenderedText(app->GetRenderer(), gFont, "Your score: " + to_string(int(SDL_GetTicks()/1000)), scoreTextColor);
+    gScore.render(app->GetRenderer(), 200, 250);
     //end game
     if (HP <= 0) {
         HP = 0;
-        SDL_SetRenderDrawColor(app->mRenderer, 255, 255, 255, 255);
-        SDL_RenderClear(app->mRenderer);
-        gScore.loadFromRenderedText(app->mRenderer, gFont, "YOU LOSE!", scoreTextColor);
-        gScore.render(app->mRenderer, (SCREEN_WIDTH/2 - gScore.getWidth()/2), (SCREEN_HEIGHT/2 - gScore.getHeight()/2));
-        SDL_RenderPresent(app->mRenderer);
+        SDL_SetRenderDrawColor(app->GetRenderer(), 255, 255, 255, 255);
+        SDL_RenderClear(app->GetRenderer());
+        gScore.loadFromRenderedText(app->GetRenderer(), gFont, "YOU LOSE!", scoreTextColor);
+        gScore.render(app->GetRenderer(), (SCREEN_WIDTH/2 - gScore.getWidth()/2), (SCREEN_HEIGHT/2 - gScore.getHeight()/2));
+        SDL_RenderPresent(app->GetRenderer());
         SDL_Delay(3000);
 
         app->EndAppLoop();
     }
 }
 
-
-bool loadMedia() {
-    //Loading success flag
-    bool success = true;
-
-
-    if(!gBG.loadFromFile(app->mRenderer,"assets/background.png")) {
-        printf ("Failed to load background image");
-        success = false;
-    }
-    
-    //Open the font
-    gFont = TTF_OpenFont( "assets/16_true_type_fonts/lazy.ttf", 28 );
-    if( gFont == NULL ) {
-        printf( "Failed to load lazy font! SDL_ttf Error: %s\n", TTF_GetError() );
-        success = false;
-    }
-    return success;
-}
-
+//close the program
 void close() {
 
     //Free loaded images
@@ -275,32 +247,16 @@ void close() {
 
 
 int main( int argc, char* args[] ) {
-
     
-    //Start up SDL and create window
+    //add enemy to emVec vector
+    addToemVec();
+    //set function for app
+    app->SetEventCallback(HandleEvent);
+    app->SetRenderCallback(HandleRendering);
     
-
-    //Load media
-    if( !loadMedia() ) {
-        printf( "Failed to load media!\n" );
-    }
-    else {
-        
-//
-        //While application is running
-        addToemVec();
-        
-        //set function for app
-        app->SetEventCallback(HandleEvent);
-        app->SetRenderCallback(HandleRendering);
-        
-        //Run game loop
-        app->RunAppLoop();
-        
-    }
-
-
-
+    //Run game loop
+    app->RunAppLoop();
+     
     //Free resources and close SDL
     close();
 

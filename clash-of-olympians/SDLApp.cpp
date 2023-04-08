@@ -66,7 +66,7 @@ SDLApp::~SDLApp() {
 }
 
 //Get the renderer
-SDL_Renderer* SDLApp::GetRenderer() {
+SDL_Renderer*& SDLApp::GetRenderer(){
     return mRenderer;
 }
 

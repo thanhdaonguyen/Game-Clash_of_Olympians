@@ -26,8 +26,9 @@ private:
     std::function<void()> mRenderCallback;
     std::function<void()> mGameObjects;
     
-public:
     SDL_Renderer* mRenderer = NULL;
+    
+public:
     
     //Constructor
     SDLApp(int imgFlag, const char* title, int x, int y, int w, int h);
@@ -36,7 +37,7 @@ public:
     ~SDLApp();
     
     //Get the renderer
-    SDL_Renderer* GetRenderer();
+    SDL_Renderer*& GetRenderer();
 
     //Handle events and rendering
     void SetEventCallback(std::function<void()> func);

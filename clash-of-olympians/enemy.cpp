@@ -13,8 +13,6 @@ Enemy::Enemy(int x, int y, SDL_Renderer*& renderer, std::string type, std::strin
     
     //Initialize the mRenderer
     mRenderer = renderer;
-    cout << mRenderer << endl;
-    cout << renderer << endl;
     //Initialize the mLTexture
     mLTexture = new LTexture();
     mLTexture->loadFromFile(renderer, img);
