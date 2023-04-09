@@ -1,7 +1,7 @@
 
 # CLASH OF OLYMPIANS
 
-Become a demigod and keep the horde of heathens away from your temple!
+- Become a demigod and keep the horde of heathens away from your temple!
 
 ## Features
 
@@ -11,23 +11,23 @@ Become a demigod and keep the horde of heathens away from your temple!
 
 ### Levels
 
-1 infinite level
+- 1 infinite level
 
 ### Characters 
 
-Update later
+- Update later
 
 ## Install and Run the game
 
 ### 1. Mac OS
 
-Step 1: Install SDL 2.0 according to this [link](https://www.libsdl.org/)
+Step 1: Install SDL 2.0 includes SDL2, SDL2_image, SDL2_ttf according to this [link](https://www.libsdl.org/)
 
 Step 2: Open `Code` tab and download the zip file of the project 
 
 ![readme1.jpg](clash-of-olympians/assets/readme1.jpg)
 
-Step 3: Extract the zip file
+Step 3: Extract the zip file.
 
 Step 4: Open Terminal, then go to the folder where this README file is stored and run these commands:
 
@@ -47,7 +47,7 @@ Try to protect your temple by throw your weapon to the enemy. You will aim your 
 
 ## Development
 
-Update later 
+Update later
 
 ## Credits
 
