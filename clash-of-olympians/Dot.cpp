@@ -102,7 +102,7 @@ void Dot::move() {
         }
     }
     if (mType == "bullet") {
-        if ( mPosX < 0 || mPosX > SCREEN_WIDTH) {
+        if ( mPosX < 110 || mPosX > SCREEN_WIDTH) {
             //move back
             //mPosX -= mVelX;
             isTouched = true;

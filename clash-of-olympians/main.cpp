@@ -221,8 +221,8 @@ void HandleEvent () {
                     emVec[i]->mTimer ++;
                     if (emVec[i]->mTimer % 60 == 0) {
                         emVec[i]->mTimer = 0;
-                        bulVec.push_back(new Dot(emVec[i]->getPosX(),emVec[i]->getPosY(),app->GetRenderer(), "bullet" ,"assets/fireball/bubble_explo1.png"));
-                        bulVec.back()->setVel(-5,1);
+                        bulVec.push_back(new Dot(emVec[i]->getPosX(),emVec[i]->getPosY() + 5,app->GetRenderer(), "bullet" ,"assets/fireball/bubble_explo1.png"));
+                        bulVec.back()->setVel(-10,1);
                     }
                 }
             }
@@ -341,11 +341,6 @@ void close() {
     gMusic = NULL;
     Mix_FreeChunk(gThrow);
     gThrow = NULL;
-    
-    //Quit SDL subsystems
-    Mix_Quit();
-    IMG_Quit();
-    SDL_Quit();
     
     //delete dynamically allocated objects
     delete app;

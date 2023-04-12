@@ -68,6 +68,7 @@ SDLApp::~SDLApp() {
     IMG_Quit();
     SDL_Quit();
     TTF_Quit();
+    Mix_Quit();
 }
 
 //Get the renderer

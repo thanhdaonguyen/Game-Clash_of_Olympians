@@ -54,10 +54,13 @@ Enemy::Enemy(int x, int y, SDL_Renderer*& renderer, std::string type, std::strin
     if (type == "Flydemon") {
         mClip = {0, 0, 64, 64};
         //Create the necessary SDL_Rects
-        mColliders.resize(1);
+        mColliders.resize(2);
         //Initialize the collision boxes's width and height
         mColliders[0].w = 46;
         mColliders[0].h = 64;
+        
+        mColliders[1].w = 46;
+        mColliders[1].w = 64;
         
         shiftColliders();
     }
@@ -167,6 +170,8 @@ void Enemy::shiftColliders() {
     if (mType == "Flydemon") {
         mColliders[0].x = int(mPosX) + 23;
         mColliders[0].y = int(mPosY) + 19;
+        mColliders[1].x = int(mPosX) + 30;
+        mColliders[1].y = int(mPosY) + 50;
     }
 }
 
