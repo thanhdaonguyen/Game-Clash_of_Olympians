@@ -19,48 +19,25 @@ Dot::Dot(int x, int y, SDL_Renderer*& renderer, std::string img) {
     mVelY = 0;
     mVelX = 0;
     
+    //Initialize the angle
+    mAngle = 45;
+    
     //Initialize mLTexture
     mLTexture = new LTexture;
     mLTexture->loadFromFile(renderer, img);
     //Initialize mRenderer
     mRenderer = renderer;
     
+    //Initialize mClip
+    mClip = {0, 0, mLTexture->getWidth(), mLTexture->getHeight()};
+    
     //Create the necessary SDL_Rects;
-    mColliders.resize(11);
+    mColliders.resize(1);
     
     //Initialize the collision boxes's width and height
-    mColliders[ 0 ].w = 6;
+    mColliders[ 0 ].w = 1;
     mColliders[ 0 ].h = 1;
 
-    mColliders[ 1 ].w = 10;
-    mColliders[ 1 ].h = 1;
-
-    mColliders[ 2 ].w = 14;
-    mColliders[ 2 ].h = 1;
-
-    mColliders[ 3 ].w = 16;
-    mColliders[ 3 ].h = 2;
-
-    mColliders[ 4 ].w = 18;
-    mColliders[ 4 ].h = 2;
-
-    mColliders[ 5 ].w = 20;
-    mColliders[ 5 ].h = 6;
-
-    mColliders[ 6 ].w = 18;
-    mColliders[ 6 ].h = 2;
-
-    mColliders[ 7 ].w = 16;
-    mColliders[ 7 ].h = 2;
-
-    mColliders[ 8 ].w = 14;
-    mColliders[ 8 ].h = 1;
-
-    mColliders[ 9 ].w = 10;
-    mColliders[ 9 ].h = 1;
-
-    mColliders[ 10 ].w = 6;
-    mColliders[ 10 ].h = 1;
     
     //Initialize colliders relative to position
     shiftColliders();
@@ -72,13 +49,35 @@ Dot::~Dot() {
 
 void Dot::handleEvent(SDL_Event &e) {
     //If mouse was pressed
-    if (e.type == SDL_MOUSEBUTTONUP) {
-        int x, y;
-        SDL_GetMouseState(&x, &y);
-        mVelX = mVel*(x - DOT_WIDTH/2 - mPosX)/sqrt((x - mPosX)*(x - mPosX) + (y - mPosY)*(y - mPosY));
-        mVelY = mVel*(y - DOT_HEIGHT/2 - mPosY)/sqrt((x - mPosX)*(x - mPosX) + (y - mPosY)*(y - mPosY));
-        
+    
+   
+    int x, y;
+    SDL_GetMouseState(&x, &y);
+    double k1 = mVel*(x - DOT_WIDTH/2 - mPosX)/sqrt((x - mPosX)*(x - mPosX) + (y - mPosY)*(y - mPosY));
+    double k2 = mVel*(y - DOT_HEIGHT/2 - mPosY)/sqrt((x - mPosX)*(x - mPosX) + (y - mPosY)*(y - mPosY));
+    if (e.type == SDL_MOUSEBUTTONDOWN) {
+       isHolding = true;
     }
+    
+    if (e.type == SDL_MOUSEBUTTONUP) {
+        isHolding = false;
+        mVelX = k1;
+        mVelY = k2;
+        std::cout << 1 << std::endl;
+    }
+    if (isHolding) {
+        mAngle = acos(-k1/sqrt((k1*k1 + k2*k2)))*k2/abs(k2)/3.14159*180;
+        std::cout << 2 << std::endl;
+    }
+    else {
+        mAngle = acos(-mVelX/sqrt((mVelY*mVelY + mVelX*mVelX)))*mVelY/abs(mVelY)/3.14159*180;
+        std::cout << "check" << std::endl;
+    }
+    
+}
+
+void Dot::changeAngle() {
+    mAngle = acos(-mVelX/sqrt((mVelY*mVelY + mVelX*mVelX)))*mVelY/abs(mVelY)/3.14159*180;
 }
 
 void Dot::move() {
@@ -105,7 +104,11 @@ void Dot::move() {
 
 void Dot::render() {
     //Show the dot
-    mLTexture->render (mRenderer, mPosX, mPosY);
+    SDL_SetRenderDrawColor(mRenderer, 255, 0, 0, 0);
+    SDL_RenderFillRect(mRenderer, &mColliders[0]);
+    mLTexture->render (mRenderer, mPosX, mPosY, &mClip, 0.5, - mAngle + 180 );
+    
+
 }
 
 double Dot::getPosX() {
@@ -117,18 +120,11 @@ double Dot::getPosY() {
 }
 
 void Dot::shiftColliders() {
-    //The row offset
-    int r = 0;
     
-    //Go through the dot's collision boxes
-    for (int set = 0; set < mColliders.size(); set++) {
-        //Center the collision box
-        mColliders[set].x = mPosX + (DOT_WIDTH - mColliders[set].w)/2;
-        
-        //Set the collision box at its row offset
-        mColliders[set].y = mPosY + r;
-        
-        //Move the row offset down the height of the collision box
-        r += mColliders[set].h;
-    }
+    //Center the collision box
+    mColliders[0].x = mPosX + mLTexture->getWidth()*0.25*(1 + mVelX/sqrt(mVelX*mVelX + mVelY*mVelY));
+    
+    //Set the collision box at its row offset
+    mColliders[0].y = mPosY + mLTexture->getWidth()*0.25*(mVelY/sqrt(mVelX*mVelX + mVelY*mVelY));
+    
 }

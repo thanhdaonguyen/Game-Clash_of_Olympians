@@ -14,7 +14,14 @@ class Hero {
     
 public:
     
+    //counting
+    int mCount = 0;
+    //holding
+    bool isHolding = false;
+    //throwing
+    bool isThrow = false;
     //Constructor
+    
     Hero(int x, int y, SDL_Renderer*& renderer, std::string img);
     //Destructor
     ~Hero();
@@ -23,6 +30,8 @@ public:
     
     //Show the hero on the screen
     void render();
+    
+    
     
 private:
     

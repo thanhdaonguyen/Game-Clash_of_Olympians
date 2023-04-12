@@ -36,7 +36,7 @@ Enemy::Enemy(int x, int y, SDL_Renderer*& renderer, std::string type, std::strin
     mType = type;
     
     if (type == "Goblin") {
-        mClip = {192, 192, 64, 64};
+        mClip = {192, 193, 64, 64};
         //Create the necessary SDL_Rects
         mColliders.resize(1);
         //Initialize the collision boxes's width and height
@@ -46,7 +46,7 @@ Enemy::Enemy(int x, int y, SDL_Renderer*& renderer, std::string type, std::strin
         shiftColliders();
     }
     if (type == "Flydemon") {
-        mClip = {192, 0, 64, 64};
+        mClip = {0, 0, 64, 64};
         //Create the necessary SDL_Rects
         mColliders.resize(1);
         //Initialize the collision boxes's width and height
@@ -90,7 +90,25 @@ void Enemy::move() {
             mVelX = -3;
         }
         mTimer = 0;
-        
+    }
+    
+    if (mType == "Goblin") {
+        if (!isStop) {
+            mClip.x = 64*(mCount/6);
+            mCount --;
+            if (mCount < 0) mCount = 8*6-1;
+        }
+        else {
+            mClip.x = 64*(mCount/10);
+            mCount --;
+            if (mCount < 8*10) mCount = 11*10-1;
+        }
+    }
+    
+    if (mType == "Flydemon") {
+        mClip.x = 64*(mCount/6);
+        mCount --;
+        if (mCount < 0) mCount = 6*6-1;
     }
 }
 int Enemy::doDamage() {
@@ -103,7 +121,7 @@ int Enemy::doDamage() {
 }
 void Enemy::render() {
     //Show the enemy on the screen
-    mLTexture->render(mRenderer, mPosX, mPosY, &mClip);
+    mLTexture->render(mRenderer, mPosX, mPosY, &mClip, 1.5);
 }
 
 double Enemy::getPosY() {

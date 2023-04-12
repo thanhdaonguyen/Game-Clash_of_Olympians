@@ -30,7 +30,7 @@ public:
     void free();
 
     //Renders texture at given point
-    void render(SDL_Renderer*& aRenderer, int x, int y, SDL_Rect* clip = NULL, double angle = 0.0, SDL_Point* center = NULL, SDL_RendererFlip flip = SDL_FLIP_NONE );
+    void render(SDL_Renderer*& aRenderer, int x, int y, SDL_Rect* clip = NULL, double ratio = 1, double angle = 0.0, SDL_Point* center = NULL, SDL_RendererFlip flip = SDL_FLIP_NONE );
 
     //modulation
     void setColor( Uint8 r, Uint8 g, Uint8 b);

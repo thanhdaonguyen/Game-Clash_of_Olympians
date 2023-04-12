@@ -25,7 +25,10 @@ public:
     //the screen 
     const int SCREEN_WIDTH = 1200;
     const int SCREEN_HEIGHT = 700;
-
+    //the angle of the spear
+    double mAngle;
+    //if the mouse is holding
+    bool isHolding = false;
     
     //Constructor
     Dot(int x, int y, SDL_Renderer*& renderer, std::string img);
@@ -38,7 +41,8 @@ public:
     
     //Moves the dot
     void move();
-    
+    //change angle
+    void changeAngle();
     //Shows the dot on the screen
     void render();
     
@@ -52,6 +56,9 @@ public:
     std::vector<SDL_Rect> mColliders;
     //Get the collision boxes
     std::vector<SDL_Rect>& getColliders();
+    //clip
+    //clip
+    SDL_Rect mClip;
     
 private:
     //The X and Y offsets of the dot

@@ -45,7 +45,12 @@ SDLApp::SDLApp(int imgFlag, const char* title, int x, int y, int w, int h) {
                 if( TTF_Init() == -1 ) {
                     printf( "SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError() );
                 }
-
+                
+                //Initialize SDL_mixer
+                if( Mix_OpenAudio( 44100, MIX_DEFAULT_FORMAT, 2, 2048 ) < 0 ) {
+                    printf( "SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError() );
+                }
+                
             }
         }
     }

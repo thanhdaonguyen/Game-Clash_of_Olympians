@@ -21,8 +21,13 @@ public:
     int mDam;
     //timer to check if it do damage
     int mTimer = 0;
+    //the counter for rendering images
+    int mCount = 0;
+    //the number of sprites to render
+    int mNumSprite = 0;
     //the type of the enemy
     std::string mType;
+    
     
     //Constructor
     Enemy (int x, int y, SDL_Renderer*& renderer, std::string type, std::string img);

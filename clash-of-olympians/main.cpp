@@ -90,7 +90,7 @@ TTF_Font* gFont = TTF_OpenFont( "assets/16_true_type_fonts/lazy.ttf", 28 );
 //Event handler
 SDL_Event e;
 //The hero
-Hero myHero(230,450,app->GetRenderer(),"assets/Shieldmaiden/4x/idle_1.png");
+Hero myHero(150,440,app->GetRenderer(),"assets/Shieldmaiden/4x/idle_1.png");
 //the dots (weapons) that will be moving on the screen
 vector<Dot*> dotVec;
 //enemys
@@ -113,9 +113,11 @@ SDL_Rect forcebarbound ={268, 428, 64, 14};
 SDL_Rect forcebar = {270, 430, 0, 10};
 bool forceHold = false;
 //the HP bar
-int HP = 1000000;
+int HP = 100;
 SDL_Color scoreTextColor = { 0, 0, 0 };
-
+//The music
+Mix_Music *gMusic = Mix_LoadMUS( "assets/maintheme.mp3" );
+Mix_Chunk *gThrow = Mix_LoadWAV( "assets/throwsound.mp3" );
 
 
 //###############################
@@ -131,21 +133,25 @@ void HandleEvent () {
             app->EndAppLoop();
         }
         if( e.type == SDL_MOUSEBUTTONDOWN) {
-            dotVec.push_back(new Dot(320,470,app->GetRenderer(),"assets/26_motion/dot.bmp"));
+            dotVec.push_back(new Dot(180,420,app->GetRenderer(),"assets/spear.png"));
             forceHold = true;
+            myHero.isHolding = true;
         }
 
         if( e.type == SDL_MOUSEBUTTONUP) {
             forceHold = false;
-            dotVec.back()->mVel = dotVec.back()->DOT_THROW_VEL*double(forcebar.w + 9)/60;
+            dotVec.back()->mVel = dotVec.back()->DOT_THROW_VEL*double(forcebar.w)/60;
             forcebar.w = 0;
+            myHero.isThrow = true;
+            myHero.mCount = 0;
+            //throw sound
+            Mix_PlayChannel( -1, gThrow, 0 );
         }
 
         if (dotVec.size() != 0) (dotVec.back())->handleEvent(e);
-
-
-
     }
+ 
+    
     // force bar
     if (forceHold && forcebar.w < 60) forcebar.w += 2;
 
@@ -162,9 +168,13 @@ void HandleEvent () {
 
     // move dots
     for (int i = 0; i < dotVec.size(); i++) {
+        
         dotVec[i]->move();
+        dotVec[i]->changeAngle();
+        //if(i < dotVec.size() - 1 ) dotVec[i]->changeAngle();
     }
-
+    //if (dotVec.size() > 0 && dotVec[dotVec.size() - 1]->isHolding == false) dotVec[dotVec.size() - 1]->changeAngle();
+ 
     //move enemys
     for (int i = 0; i < emVec.size(); i++) {
         emVec[i]->move();
@@ -191,6 +201,7 @@ void HandleRendering () {
     //render background
     SDL_RenderCopy(app->GetRenderer(), gBG.mTexture, NULL, NULL);
     //render hero
+    
     myHero.render();
     //render dots;
     unsigned long k1 = 0, k2 = dotVec.size();
@@ -213,6 +224,9 @@ void HandleRendering () {
     //Render score to the screen
     gScore.loadFromRenderedText(app->GetRenderer(), gFont, "Your score: " + to_string(int(SDL_GetTicks()/1000)), scoreTextColor);
     gScore.render(app->GetRenderer(), 200, 250);
+    //Play music
+    if( Mix_PlayingMusic() == 0 ) Mix_PlayMusic( gMusic, -1 );
+    
     //end game
     if (HP <= 0) {
         HP = 0;
@@ -239,6 +253,17 @@ void close() {
     //Free global font
     TTF_CloseFont( gFont );
     gFont = NULL;
+    
+    //Free music
+    Mix_FreeMusic( gMusic );
+    gMusic = NULL;
+    Mix_FreeChunk(gThrow);
+    gThrow = NULL;
+    
+    //Quit SDL subsystems
+    Mix_Quit();
+    IMG_Quit();
+    SDL_Quit();
     
     //delete dynamically allocated objects
     delete app;
