@@ -22,16 +22,22 @@ Enemy::Enemy(int x, int y, SDL_Renderer*& renderer, std::string type, std::strin
     mPosY = y;
     //Set dam
     if (type == "Goblin") {
-        mDam = 7;
+        mDam = 3;
     }
     if (type == "Flydemon") {
         mDam = 5;
     }
     
     //Initialize the velocity
-    mVelX = -3;
-    mVelY = 0;
-    
+    if (type == "Goblin") {
+        mVelX = -1.2;
+        mVelY = 0;
+    }
+    if (type == "Flydemon") {
+        mVelX = -1.5;
+        mVelY = 0;
+    }
+
     //Initialize type
     mType = type;
     
@@ -40,8 +46,8 @@ Enemy::Enemy(int x, int y, SDL_Renderer*& renderer, std::string type, std::strin
         //Create the necessary SDL_Rects
         mColliders.resize(1);
         //Initialize the collision boxes's width and height
-        mColliders[0].w = 64;
-        mColliders[0].h = 64;
+        mColliders[0].w = 30;
+        mColliders[0].h = 60;
         
         shiftColliders();
     }
@@ -50,7 +56,7 @@ Enemy::Enemy(int x, int y, SDL_Renderer*& renderer, std::string type, std::strin
         //Create the necessary SDL_Rects
         mColliders.resize(1);
         //Initialize the collision boxes's width and height
-        mColliders[0].w = 64;
+        mColliders[0].w = 46;
         mColliders[0].h = 64;
         
         shiftColliders();
@@ -72,22 +78,33 @@ void Enemy::move() {
     
     //If the enemy is close enough, it will stop
     if ( mPosX < stopX ) {
-        mVelY = 0;
-        mVelX = 0;
         isStop = true;
+    }
+    
+    if (isStop == true) {
+        mVelX = 0;
+        mVelY = 0;
+    }
+    if (isStop == false) {
+        if (mType == "Goblin") {
+            mVelX = -1.2;
+        }
+        if (mType == "Flydemon") {
+            mVelX = -1.5;
+        }
     }
     
     if ( isTouched ) {
         isTouched = false;
         isStop = false;
         if (mType == "Goblin") {
-            mPosX = 1400;
-            mVelX = -3;
+            mPosX = rand() % (1800 - 1300 + 1) + 1300;
+            mVelX = -1.2;
         }
         if (mType == "Flydemon") {
             mPosX = 1400;
             mPosY = rand() % (400 - 200 + 1) + 200;
-            mVelX = -3;
+            mVelX = -1.5;
         }
         mTimer = 0;
     }
@@ -112,16 +129,22 @@ void Enemy::move() {
     }
 }
 int Enemy::doDamage() {
-    mTimer ++;
-    if (mTimer % 35 == 0) {
-        mTimer = 0;
+    if (mType == "Goblin") {
+        mTimer ++;
+        if (mTimer % 35 == 0) {
+            mTimer = 0;
+            return mDam;
+        }
+    }
+    if (mType == "Flydemon") {
         return mDam;
     }
     return 0;
 }
 void Enemy::render() {
     //Show the enemy on the screen
-    mLTexture->render(mRenderer, mPosX, mPosY, &mClip, 1.5);
+    if (mType == "Goblin") mLTexture->render(mRenderer, mPosX, mPosY, &mClip, 1.3);
+    if (mType == "Flydemon") mLTexture->render(mRenderer, mPosX, mPosY, &mClip, 1.5);
 }
 
 double Enemy::getPosY() {
@@ -137,16 +160,18 @@ void Enemy::setStop(double x) {
 }
 
 void Enemy::shiftColliders() {
-    //the row offset
-    int r = 0;
-    
-    //Go through the object's collision boxes
-    for (int set = 0; set < mColliders.size(); set++) {
-        mColliders[set].x = int(mPosX);
-        mColliders[set].y = int(mPosY) + r;
-        
-        //Move the row offset down the height of the collision box
-        r += mColliders[set].h;
+    if (mType == "Goblin") {
+        mColliders[0].x = int(mPosX) + 37;
+        mColliders[0].y = int(mPosY) + 13;
     }
-    
+    if (mType == "Flydemon") {
+        mColliders[0].x = int(mPosX) + 23;
+        mColliders[0].y = int(mPosY) + 19;
+    }
+}
+
+
+void Enemy::setPos(double x, double y) {
+    mPosX = x;
+    mPosY = y;
 }

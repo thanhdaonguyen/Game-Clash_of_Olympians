@@ -81,7 +81,7 @@ LTexture gBG(app->GetRenderer(),"assets/background.png");
 LTexture gHPTexture(app->GetRenderer());
 LTexture gScore(app->GetRenderer());
 
-TTF_Font* gFont = TTF_OpenFont( "assets/16_true_type_fonts/lazy.ttf", 28 );
+TTF_Font* gFont = TTF_OpenFont( "assets/vinque/vinque.otf", 28 );
 
 
 //##############################
@@ -93,6 +93,9 @@ SDL_Event e;
 Hero myHero(150,440,app->GetRenderer(),"assets/Shieldmaiden/4x/idle_1.png");
 //the dots (weapons) that will be moving on the screen
 vector<Dot*> dotVec;
+//the dots (bullet) of flying demon
+vector<Dot*> bulVec;
+
 //enemys
 vector<Enemy*> emVec;
 Enemy gob1(1280,620,app->GetRenderer(),"Goblin","assets/goblin/goblinsword.png");
@@ -109,15 +112,23 @@ void addToemVec() {
     emVec.push_back(&gob3);
 }
 //The force bar
-SDL_Rect forcebarbound ={268, 428, 64, 14};
-SDL_Rect forcebar = {270, 430, 0, 10};
+SDL_Rect forcebarbound ={198, 548, 104, 14};
+SDL_Rect forcebar = {200, 550, 0, 10};
 bool forceHold = false;
 //the HP bar
 int HP = 100;
-SDL_Color scoreTextColor = { 0, 0, 0 };
+SDL_Color scoreTextColor = { 85, 117, 149 };
 //The music
 Mix_Music *gMusic = Mix_LoadMUS( "assets/maintheme.mp3" );
 Mix_Chunk *gThrow = Mix_LoadWAV( "assets/throwsound.mp3" );
+//the timer for throwing spear
+Uint32 mTimer = 0;
+//the sign for playing
+bool isPlaying = true;
+//the score mile stone
+Uint32 score = 0;
+Uint32 score0 = 0;
+
 
 
 //###############################
@@ -126,78 +137,136 @@ Mix_Chunk *gThrow = Mix_LoadWAV( "assets/throwsound.mp3" );
 //HANDLE ALL EVENTS
 void HandleEvent () {
     
-    //Handle events on queue
-    while( SDL_PollEvent( &e ) != 0 ) {
-        //User requests quit
-        if( e.key.keysym.sym == SDLK_ESCAPE ) {
-            app->EndAppLoop();
+    if (isPlaying) {
+        //Handle events on queue
+        while( SDL_PollEvent( &e ) != 0 ) {
+            //User requests quit
+            if( e.key.keysym.sym == SDLK_ESCAPE ) {
+                app->EndAppLoop();
+            }
+            if( e.type == SDL_MOUSEBUTTONDOWN) {
+                dotVec.push_back(new Dot(180,420,app->GetRenderer(), "spear", "assets/spear.png"));
+                forceHold = true;
+                myHero.isHolding = true;
+            }
+            
+            if( e.type == SDL_MOUSEBUTTONUP) {
+                
+                forceHold = false;
+                dotVec.back()->mVel = 5 + dotVec.back()->DOT_THROW_VEL*double(forcebar.w)/100;
+                forcebar.w = 0;
+                myHero.isThrow = true;
+                myHero.mCount = 0;
+                //throw sound
+                Mix_PlayChannel( -1, gThrow, 0 );
+                mTimer = SDL_GetTicks();
+                
+            }
+            
+            if (dotVec.size() != 0) (dotVec.back())->handleEvent(e);
         }
-        if( e.type == SDL_MOUSEBUTTONDOWN) {
-            dotVec.push_back(new Dot(180,420,app->GetRenderer(),"assets/spear.png"));
-            forceHold = true;
-            myHero.isHolding = true;
-        }
-
-        if( e.type == SDL_MOUSEBUTTONUP) {
-            forceHold = false;
-            dotVec.back()->mVel = dotVec.back()->DOT_THROW_VEL*double(forcebar.w)/60;
-            forcebar.w = 0;
-            myHero.isThrow = true;
-            myHero.mCount = 0;
-            //throw sound
-            Mix_PlayChannel( -1, gThrow, 0 );
-        }
-
-        if (dotVec.size() != 0) (dotVec.back())->handleEvent(e);
-    }
- 
-    
-    // force bar
-    if (forceHold && forcebar.w < 60) forcebar.w += 2;
-
-
-    //Check the dot vector to delete redundant dots
-    int k = (int)dotVec.size();
-    for (int i = k - 1; i >= 0; i--) {
-        if (dotVec[i]->isTouched) {
-            delete dotVec[i];
-            dotVec.erase(dotVec.begin() + i);
-            dotVec.shrink_to_fit();
-        }
-    }
-
-    // move dots
-    for (int i = 0; i < dotVec.size(); i++) {
         
-        dotVec[i]->move();
-        dotVec[i]->changeAngle();
-        //if(i < dotVec.size() - 1 ) dotVec[i]->changeAngle();
-    }
-    //if (dotVec.size() > 0 && dotVec[dotVec.size() - 1]->isHolding == false) dotVec[dotVec.size() - 1]->changeAngle();
- 
-    //move enemys
-    for (int i = 0; i < emVec.size(); i++) {
-        emVec[i]->move();
-    }
+        
+        // force bar
+        if (forceHold && forcebar.w < 100) forcebar.w += 2;
+        
+        
+        //Check the dot vector to delete redundant dots
+        int k = (int)dotVec.size();
+        for (int i = k - 1; i >= 0; i--) {
+            if (dotVec[i]->isTouched) {
+                delete dotVec[i];
+                dotVec.erase(dotVec.begin() + i);
+                dotVec.shrink_to_fit();
+            }
+        }
+        
+        //Check the bul vector to delete redundant dots
+        int k2 = (int)bulVec.size();
+        for (int i = k2 - 1; i >= 0; i--) {
+            if (bulVec[i]->isTouched) {
+                HP -= 5;
+                delete bulVec[i];
+                bulVec.erase(bulVec.begin() + i);
+                bulVec.shrink_to_fit();
+            }
+        }
 
-    //deal damage
-    for (int i = 0; i < emVec.size(); i++) {
-        if (emVec[i]->isStop) {
-            HP -= emVec[i]->doDamage();
+        
+        
+        // move dots
+        for (int i = 0; i < dotVec.size(); i++) {
+            
+            dotVec[i]->move();
+            dotVec[i]->changeAngle();
+        }
+        
+        //move bul
+        for (int i = 0; i < bulVec.size(); i++) {
+            bulVec[i]->move();
+            bulVec[i]->changeAngle();
+        }
+       
+        
+        //move enemys
+        for (int i = 0; i < emVec.size(); i++) {
+            emVec[i]->move();
+        }
+        
+        //deal damage
+        for (int i = 0; i < emVec.size(); i++) {
+            if (emVec[i]->isStop) {
+                if (emVec[i]->mType == "Goblin") HP -= emVec[i]->doDamage();
+                else if (emVec[i]->mType == "Flydemon") {
+                    emVec[i]->mTimer ++;
+                    if (emVec[i]->mTimer % 60 == 0) {
+                        emVec[i]->mTimer = 0;
+                        bulVec.push_back(new Dot(emVec[i]->getPosX(),emVec[i]->getPosY(),app->GetRenderer(), "bullet" ,"assets/fireball/bubble_explo1.png"));
+                        bulVec.back()->setVel(-5,1);
+                    }
+                }
+            }
+        }
+        
+        //check collisions
+        checkCollisions(dotVec, emVec);
+    }
+    
+    else {
+        while( SDL_PollEvent( &e ) != 0 ) {
+            //User requests quit
+            if( e.key.keysym.sym == SDLK_q ) {
+                app->EndAppLoop();
+            }
+            if( e.key.keysym.sym == SDLK_r ) {
+                gob1.setPos(1280,620);
+                gob2.setPos(1350,620);
+                gob3.setPos(1460,620);
+                fly1.setPos(1590,250);
+                fly2.setPos(1700,300);
+                for (int i = 0; i < emVec.size(); i++) {
+                    emVec[i]->isStop = false;
+                }
+                HP = 100;
+                score = SDL_GetTicks();
+                score0 = SDL_GetTicks();
+                isPlaying = true;
+            }
+            
         }
     }
-
-    //check collisions
-    checkCollisions(dotVec, emVec);
+    
     
 }
 
 //HANDLE ALL RENDERINGS
 void HandleRendering () {
+    
+    cout << bulVec.size() << endl;
     //Clear screen
     SDL_SetRenderDrawColor(app->GetRenderer(), 255, 255, 255, 255);
     SDL_RenderClear(app->GetRenderer());
-
+    
     //render background
     SDL_RenderCopy(app->GetRenderer(), gBG.mTexture, NULL, NULL);
     //render hero
@@ -208,36 +277,49 @@ void HandleRendering () {
     for(unsigned long i = k1; i < k2; i++) {
         dotVec[i]->render();
     }
+    
     //render enemy
     for (unsigned long i = 0; i < emVec.size(); i++) {
-            emVec[i]->render();
+        //        SDL_SetRenderDrawColor(app->GetRenderer(), 255, 255, 255, 255);
+        //        SDL_RenderFillRect(app->GetRenderer(), &emVec[i]->mColliders[0]);
+        emVec[i]->render();
     }
+    //render bullet
+    for (unsigned long i = 0; i < bulVec.size(); i++) {
+        bulVec[i]->render();
+    }
+    //render b
+    
     //render force bar
-    SDL_SetRenderDrawColor(app->GetRenderer(), 255, 255, 255, 0); // set color to blue
+    SDL_SetRenderDrawColor(app->GetRenderer(), 140, 140, 140, 0); // set color to blue
     SDL_RenderFillRect(app->GetRenderer(), &forcebarbound); // draw filled rectangle
-    SDL_SetRenderDrawColor(app->GetRenderer(), 100, 200, 40, 0); // set color to blue
+    SDL_SetRenderDrawColor(app->GetRenderer(), 218, 138, 47, 0); // set color to blue
     SDL_RenderFillRect(app->GetRenderer(), &forcebar); // draw filled rectangle
-
+    
     //Render HP to the screen
-    gHPTexture.loadFromRenderedText(app->GetRenderer(), gFont, "Your HP: " + to_string(HP), scoreTextColor);
-    gHPTexture.render(app->GetRenderer(), 200, 200);
+    scoreTextColor = { 85, 117, 149 };
+    gHPTexture.loadFromRenderedText(app->GetRenderer(), gFont, to_string(HP), scoreTextColor);
+    gHPTexture.render(app->GetRenderer(), 75, 55);
     //Render score to the screen
-    gScore.loadFromRenderedText(app->GetRenderer(), gFont, "Your score: " + to_string(int(SDL_GetTicks()/1000)), scoreTextColor);
-    gScore.render(app->GetRenderer(), 200, 250);
+    if (isPlaying == true) score = SDL_GetTicks();
+    gScore.loadFromRenderedText(app->GetRenderer(), gFont, "Your score: " + to_string(int((score - score0)/1000)), scoreTextColor);
+    gScore.render(app->GetRenderer(), 20, 5);
     //Play music
     if( Mix_PlayingMusic() == 0 ) Mix_PlayMusic( gMusic, -1 );
     
     //end game
     if (HP <= 0) {
         HP = 0;
-        SDL_SetRenderDrawColor(app->GetRenderer(), 255, 255, 255, 255);
-        SDL_RenderClear(app->GetRenderer());
+        isPlaying = false;
+    }
+    
+    if (isPlaying == false) {
+        scoreTextColor = { 255, 188, 0 };
         gScore.loadFromRenderedText(app->GetRenderer(), gFont, "YOU LOSE!", scoreTextColor);
         gScore.render(app->GetRenderer(), (SCREEN_WIDTH/2 - gScore.getWidth()/2), (SCREEN_HEIGHT/2 - gScore.getHeight()/2));
-        SDL_RenderPresent(app->GetRenderer());
-        SDL_Delay(3000);
-
-        app->EndAppLoop();
+        gScore.loadFromRenderedText(app->GetRenderer(), gFont, "Press Q to quit game, R to restart", scoreTextColor);
+        gScore.render(app->GetRenderer(), (SCREEN_WIDTH/2 - gScore.getWidth()/2), (SCREEN_HEIGHT/2 - gScore.getHeight()/2) + 50);
+        
     }
 }
 

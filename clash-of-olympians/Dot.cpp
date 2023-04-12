@@ -8,7 +8,10 @@
 #include "Dot.hpp"
 
 //Dot functions
-Dot::Dot(int x, int y, SDL_Renderer*& renderer, std::string img) {
+Dot::Dot(int x, int y, SDL_Renderer*& renderer, std::string type, std::string img) {
+    //set type
+    mType = type;
+    
     //Initialize the offsets
     mPosX = x;
     mPosY = y;
@@ -63,15 +66,12 @@ void Dot::handleEvent(SDL_Event &e) {
         isHolding = false;
         mVelX = k1;
         mVelY = k2;
-        std::cout << 1 << std::endl;
     }
     if (isHolding) {
         mAngle = acos(-k1/sqrt((k1*k1 + k2*k2)))*k2/abs(k2)/3.14159*180;
-        std::cout << 2 << std::endl;
     }
     else {
         mAngle = acos(-mVelX/sqrt((mVelY*mVelY + mVelX*mVelX)))*mVelY/abs(mVelY)/3.14159*180;
-        std::cout << "check" << std::endl;
     }
     
 }
@@ -85,29 +85,42 @@ void Dot::move() {
     mPosX += mVelX;
     //move the dot up or down
     mPosY += mVelY;
-    if (mVelY != 0) mVelY += DOT_THROW_VEL*0.02;
+    if (mVelY != 0) mVelY += DOT_THROW_VEL*0.03;
     shiftColliders();
-    
-    //If the dot went too far
-    if ( mPosX < 0 || mPosX + DOT_WIDTH > SCREEN_WIDTH) {
-        //move back
-        //mPosX -= mVelX;
-        isTouched = true;
+    if (mType == "spear") {
+        //If the dot went too far
+        if ( mPosX < 0 || mPosX > SCREEN_WIDTH) {
+            //move back
+            //mPosX -= mVelX;
+            isTouched = true;
+        }
+        
+        //If the dot went too far
+        if (mPosY < 0 || mPosY > SCREEN_HEIGHT - 40) {
+            //move back
+            isTouched = true;
+        }
     }
-    
-    //If the dot went too far
-    if (mPosY < 0 || mPosY + DOT_HEIGHT > SCREEN_HEIGHT - 40) {
-        //move back
-        isTouched = true;
+    if (mType == "bullet") {
+        if ( mPosX < 0 || mPosX > SCREEN_WIDTH) {
+            //move back
+            //mPosX -= mVelX;
+            isTouched = true;
+        }
+        
+        //If the dot went too far
+        if (mPosY < 0 || mPosY > SCREEN_HEIGHT - 200) {
+            //move back
+            isTouched = true;
+        }
     }
 }
 
 void Dot::render() {
     //Show the dot
-    SDL_SetRenderDrawColor(mRenderer, 255, 0, 0, 0);
-    SDL_RenderFillRect(mRenderer, &mColliders[0]);
-    mLTexture->render (mRenderer, mPosX, mPosY, &mClip, 0.5, - mAngle + 180 );
     
+    if (mType == "spear") mLTexture->render (mRenderer, mPosX, mPosY, &mClip, 0.5, - mAngle + 180 );
+    if (mType == "bullet") mLTexture->render (mRenderer, mPosX, mPosY, &mClip, 1.5, - mAngle + 180 );
 
 }
 
@@ -127,4 +140,9 @@ void Dot::shiftColliders() {
     //Set the collision box at its row offset
     mColliders[0].y = mPosY + mLTexture->getWidth()*0.25*(mVelY/sqrt(mVelX*mVelX + mVelY*mVelY));
     
+}
+
+void Dot::setVel(double x, double y) {
+    mVelX = x;
+    mVelY = y;
 }

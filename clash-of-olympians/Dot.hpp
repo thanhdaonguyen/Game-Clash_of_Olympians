@@ -19,7 +19,7 @@ public:
     static const int DOT_WIDTH = 20;
     static const int DOT_HEIGHT = 20;
     //The max velocity of the dot
-    double DOT_THROW_VEL = 12;
+    double DOT_THROW_VEL = 15;
     //The real velocity
     double mVel = DOT_THROW_VEL;
     //the screen 
@@ -29,9 +29,11 @@ public:
     double mAngle;
     //if the mouse is holding
     bool isHolding = false;
+    //type
+    std::string mType;
     
     //Constructor
-    Dot(int x, int y, SDL_Renderer*& renderer, std::string img);
+    Dot(int x, int y, SDL_Renderer*& renderer, std::string type, std::string img);
     
     //Destructor
     ~Dot();
@@ -49,6 +51,8 @@ public:
     double getPosX();
     
     double getPosY();
+    
+    void setVel(double x, double y);
     
     bool isTouched = false;
 

@@ -44,6 +44,8 @@ public:
     double getPosY();
     //set the stop position
     void setStop(double x);
+    //set position
+    void setPos(double x, double y);
     //Moves the collision boxes relative to the position
     void shiftColliders();
     //check if the enemy approached close enough or be touched

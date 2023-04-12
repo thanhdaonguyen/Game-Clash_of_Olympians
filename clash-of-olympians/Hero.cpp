@@ -59,6 +59,7 @@ void Hero::render() {
         }
     }
     mCount ++;
-    mLTexture->render(mRenderer, hPosX, hPosY, NULL, 0.5);
+    if (isThrow == true) mLTexture->render(mRenderer, hPosX, hPosY - 10, NULL, 0.5);
+    else mLTexture->render(mRenderer, hPosX, hPosY, NULL, 0.5);
 };
 
