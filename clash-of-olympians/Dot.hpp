@@ -22,6 +22,8 @@ public:
     static const int DOT_HEIGHT = 20;
     //The max velocity of the dot
     double DOT_THROW_VEL = 15;
+    //the gravity
+    double mGravity = 0.45;
     //The real velocity
     double mVel = DOT_THROW_VEL;
     //the screen 

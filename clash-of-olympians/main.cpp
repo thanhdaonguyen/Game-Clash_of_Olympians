@@ -134,7 +134,10 @@ Mix_Chunk *gThrow = Mix_LoadWAV( "assets/throwsound.mp3" );
 //the timer for throwing spear
 Uint32 mTimer = 0;
 //the sign for playing
-bool isPlaying = true;
+bool isPlaying = false;
+bool isMenu = true;
+bool isHighscore = false;
+bool isPause = false;
 //the score mile stone
 Uint32 score = 0;
 Uint32 score0 = 0;
@@ -162,12 +165,48 @@ void HandleCollisionsSpearAndReward(vector<Dot*> dotVec, vector<Reward*> rwdVec)
 //HANDLE ALL EVENTS
 void HandleEvent () {
     
+    if (isMenu) {
+        while( SDL_PollEvent( &e ) != 0 ) {
+            
+            //User requests play game
+            if( e.key.keysym.sym == SDLK_p ) {
+                gob1.setPos(1280,620); gob1.health = gob1.healthmax;
+                gob2.setPos(1350,620); gob2.health = gob2.healthmax;
+                gob3.setPos(1460,620); gob3.health = gob3.healthmax;
+                fly1.setPos(1590,250); fly1.health = fly1.healthmax;
+                fly2.setPos(1700,300); fly2.health = fly2.healthmax;
+                
+                for (int i = 0; i < emVec.size(); i++) {
+                    emVec[i]->isStop = false;
+                }
+                HP = 100;
+                score = SDL_GetTicks();
+                score0 = SDL_GetTicks();
+                //delete bullets remain on the screen
+                for (int i = 0; i < bulVec.size(); i++) {
+                    bulVec[i]->isTouched = true;
+                }
+                //delette rewards remain on the screen
+                for (int i = 0; i < rwdVec.size(); i++) {
+                    rwdVec[i]->isTouched = true;
+                }
+                //reset hero's abilities
+                myHero.speed = 1;
+                myHero.strength = 3;
+                
+                isPlaying = true;
+                isMenu = false;
+            }
+        }
+    }
+    
     if (isPlaying) {
         //Handle events on queue
         while( SDL_PollEvent( &e ) != 0 ) {
             //User requests quit
             if( e.key.keysym.sym == SDLK_ESCAPE ) {
-                app->EndAppLoop();
+                isPlaying = false;
+                isPause = true;
             }
             
             //aim shots
@@ -181,6 +220,7 @@ void HandleEvent () {
             if( e.type == SDL_MOUSEBUTTONUP) {
                 
                 forceHold = false;
+                dotVec.back()->DOT_THROW_VEL*=myHero.speed;
                 dotVec.back()->mVel = 5 + dotVec.back()->DOT_THROW_VEL*double(forcebar.w)/100;
                 forcebar.w = 0;
                 myHero.isThrow = true;
@@ -288,9 +328,15 @@ void HandleEvent () {
         //check collisions
         HandleCollisionsSpearAndEnemy(dotVec, emVec);
         HandleCollisionsSpearAndReward(dotVec, rwdVec);
+        
+        //end game
+        if (HP <= 0) {
+            HP = 0;
+            isPlaying = false;
+        }
     }
     
-    else {
+    if (isPause) {
         while( SDL_PollEvent( &e ) != 0 ) {
             //User requests quit
             if( e.key.keysym.sym == SDLK_q ) {
@@ -298,11 +344,12 @@ void HandleEvent () {
             }
             //User requests restart
             if( e.key.keysym.sym == SDLK_r ) {
-                gob1.setPos(1280,620);
-                gob2.setPos(1350,620);
-                gob3.setPos(1460,620);
-                fly1.setPos(1590,250);
-                fly2.setPos(1700,300);
+                gob1.setPos(1280,620); gob1.health = gob1.healthmax;
+                gob2.setPos(1350,620); gob2.health = gob2.healthmax;
+                gob3.setPos(1460,620); gob3.health = gob3.healthmax;
+                fly1.setPos(1590,250); fly1.health = fly1.healthmax;
+                fly2.setPos(1700,300); fly2.health = fly2.healthmax;
+                
                 for (int i = 0; i < emVec.size(); i++) {
                     emVec[i]->isStop = false;
                 }
@@ -313,8 +360,26 @@ void HandleEvent () {
                 for (int i = 0; i < bulVec.size(); i++) {
                     bulVec[i]->isTouched = true;
                 }
+                //delette rewards remain on the screen
+                for (int i = 0; i < rwdVec.size(); i++) {
+                    rwdVec[i]->isTouched = true;
+                }
+                //reset hero's abilities
+                myHero.speed = 1;
+                myHero.strength = 3;
                 
                 isPlaying = true;
+                isPause = false;
+            }
+            //User requests continue
+            if( e.key.keysym.sym == SDLK_c ) {
+                isPlaying = true;
+                isPause = false;
+            }
+            
+            if( e.key.keysym.sym == SDLK_m ) {
+                isMenu = true;
+                isPause = false;
             }
             
         }
@@ -325,75 +390,87 @@ void HandleEvent () {
 
 //HANDLE ALL RENDERINGS
 void HandleRendering () {
-    //Clear screen
-    SDL_SetRenderDrawColor(app->GetRenderer(), 255, 255, 255, 255);
-    SDL_RenderClear(app->GetRenderer());
     
-    //render background
-    SDL_RenderCopy(app->GetRenderer(), gBG.mTexture, NULL, NULL);
-    //render hero
-    
-    myHero.render();
-    //render dots;
-    unsigned long k1 = 0, k2 = dotVec.size();
-    for(unsigned long i = k1; i < k2; i++) {
-        dotVec[i]->render();
-    }
-    
-    //render enemy
-    for (unsigned long i = 0; i < emVec.size(); i++) {
-        //        SDL_SetRenderDrawColor(app->GetRenderer(), 255, 255, 255, 255);
-        //        SDL_RenderFillRect(app->GetRenderer(), &emVec[i]->mColliders[0]);
-        emVec[i]->render();
-    }
-    //render bullets
-    for (unsigned long i = 0; i < bulVec.size(); i++) {
-        bulVec[i]->render();
-    }
-    //render reward
-    for (unsigned long i = 0; i < rwdVec.size(); i++) {
-        rwdVec[i]->render();
-    }
-    
-    //render force bar
-    SDL_SetRenderDrawColor(app->GetRenderer(), 140, 140, 140, 0); // set color to blue
-    SDL_RenderFillRect(app->GetRenderer(), &forcebarbound); // draw filled rectangle
-    SDL_SetRenderDrawColor(app->GetRenderer(), 218, 138, 47, 0); // set color to blue
-    SDL_RenderFillRect(app->GetRenderer(), &forcebar); // draw filled rectangle
-    
-    //Render HP to the screen
-    scoreTextColor = { 85, 117, 149 };
-    gHPTexture.loadFromRenderedText(app->GetRenderer(), gFont, to_string(HP), scoreTextColor);
-    gHPTexture.render(app->GetRenderer(), 75, 55);
-    //Render score to the screen
-    if (isPlaying == true) score = SDL_GetTicks();
-    gScore.loadFromRenderedText(app->GetRenderer(), gFont, "Your score: " + to_string(int((score - score0)/1000)), scoreTextColor);
-    gScore.render(app->GetRenderer(), 20, 5);
-    //render game guide
-    if (SDL_GetTicks() < 5000) {
+    if (isMenu) {
+        SDL_SetRenderDrawColor(app->GetRenderer(), 20, 20, 20, 0);
+        SDL_RenderClear(app->GetRenderer());
         scoreTextColor = { 255, 188, 0 };
-        gScore.loadFromRenderedText(app->GetRenderer(), gFont, "Press MOUSE on the screen to aim shots!", scoreTextColor);
+        gScore.loadFromRenderedText(app->GetRenderer(), gFont, "CLASH OF OLYMPIANS", scoreTextColor);
         gScore.render(app->GetRenderer(), (SCREEN_WIDTH/2 - gScore.getWidth()/2), (SCREEN_HEIGHT/2 - gScore.getHeight()/2));
+        gScore.loadFromRenderedText(app->GetRenderer(), gFont, "Press P to play game, H to show restart", scoreTextColor);
+        gScore.render(app->GetRenderer(), (SCREEN_WIDTH/2 - gScore.getWidth()/2), (SCREEN_HEIGHT/2 - gScore.getHeight()/2) + 50);
     }
     
+    
+    if (isPlaying) {
+        //Clear screen
+        SDL_SetRenderDrawColor(app->GetRenderer(), 255, 255, 255, 255);
+        SDL_RenderClear(app->GetRenderer());
+        
+        //render background
+        SDL_RenderCopy(app->GetRenderer(), gBG.mTexture, NULL, NULL);
+        //render hero
+        
+        myHero.render();
+        //render dots;
+        unsigned long k1 = 0, k2 = dotVec.size();
+        for(unsigned long i = k1; i < k2; i++) {
+            dotVec[i]->render();
+        }
+        
+        //render enemy
+        for (unsigned long i = 0; i < emVec.size(); i++) {
+            //        SDL_SetRenderDrawColor(app->GetRenderer(), 255, 255, 255, 255);
+            //        SDL_RenderFillRect(app->GetRenderer(), &emVec[i]->mColliders[0]);
+            emVec[i]->render();
+        }
+        //render bullets
+        for (unsigned long i = 0; i < bulVec.size(); i++) {
+            bulVec[i]->render();
+        }
+        //render reward
+        for (unsigned long i = 0; i < rwdVec.size(); i++) {
+            rwdVec[i]->render();
+        }
+        
+        //render force bar
+        SDL_SetRenderDrawColor(app->GetRenderer(), 140, 140, 140, 0); // set color to blue
+        SDL_RenderFillRect(app->GetRenderer(), &forcebarbound); // draw filled rectangle
+        SDL_SetRenderDrawColor(app->GetRenderer(), 218, 138, 47, 0); // set color to blue
+        SDL_RenderFillRect(app->GetRenderer(), &forcebar); // draw filled rectangle
+        
+        //Render HP to the screen
+        scoreTextColor = { 85, 117, 149 };
+        gHPTexture.loadFromRenderedText(app->GetRenderer(), gFont, to_string(HP), scoreTextColor);
+        gHPTexture.render(app->GetRenderer(), 75, 55);
+        //Render score to the screen
+        if (isPlaying == true) score = SDL_GetTicks();
+        gScore.loadFromRenderedText(app->GetRenderer(), gFont, "Your score: " + to_string(int((score - score0)/1000)), scoreTextColor);
+        gScore.render(app->GetRenderer(), 20, 5);
+        //render game guide
+        if ((score - score0)/1000 < 5) {
+            scoreTextColor = { 255, 188, 0 };
+            gScore.loadFromRenderedText(app->GetRenderer(), gFont, "Press MOUSE on the screen to aim shots!", scoreTextColor);
+            gScore.render(app->GetRenderer(), (SCREEN_WIDTH/2 - gScore.getWidth()/2), (SCREEN_HEIGHT/2 - gScore.getHeight()/2));
+        }
+    }
     //Play music
     if( Mix_PlayingMusic() == 0 ) Mix_PlayMusic( gMusic, -1 );
     
-    //end game
-    if (HP <= 0) {
-        HP = 0;
-        isPlaying = false;
-    }
+    
     
     //end game menu
-    if (isPlaying == false) {
+    if (isPause) {
+        SDL_SetRenderDrawColor(app->GetRenderer(), 20, 20, 20, 0);
+        SDL_RenderClear(app->GetRenderer());
         scoreTextColor = { 255, 188, 0 };
         gScore.loadFromRenderedText(app->GetRenderer(), gFont, "YOU LOSE!", scoreTextColor);
         gScore.render(app->GetRenderer(), (SCREEN_WIDTH/2 - gScore.getWidth()/2), (SCREEN_HEIGHT/2 - gScore.getHeight()/2));
-        gScore.loadFromRenderedText(app->GetRenderer(), gFont, "Press Q to quit game, R to restart", scoreTextColor);
+        gScore.loadFromRenderedText(app->GetRenderer(), gFont, "Press Q to quit game, R to restart, C to continue, M for menu", scoreTextColor);
         gScore.render(app->GetRenderer(), (SCREEN_WIDTH/2 - gScore.getWidth()/2), (SCREEN_HEIGHT/2 - gScore.getHeight()/2) + 50);
-        
     }
+    
+    
 }
 
 //close the program

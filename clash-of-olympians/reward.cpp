@@ -59,6 +59,7 @@ void Reward::render() {
 
 void Reward::giveReward(Hero* mHero, int& HP) {
     mHero->strength += mStrength;
+    if(mStrength != 0) mHero->speed += 0.2;
     HP += mHealth;
 }
 

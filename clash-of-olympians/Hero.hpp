@@ -22,6 +22,8 @@ public:
     bool isThrow = false;
     //the strength of the hero
     double strength = 3;
+    //speed
+    double speed = 1;
     
     
     //Constructor

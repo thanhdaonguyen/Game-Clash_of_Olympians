@@ -131,7 +131,7 @@ void Dot::move() {
     mPosX += mVelX;
     //move the dot up or down
     mPosY += mVelY;
-    if (mVelY != 0) mVelY += DOT_THROW_VEL*0.03;
+    if (mVelY != 0) mVelY += mGravity;
     shiftColliders();
     if (mType == "spear") {
         
