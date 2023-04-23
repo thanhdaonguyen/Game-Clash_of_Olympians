@@ -25,6 +25,10 @@ public:
     int mCount = 0;
     //the number of sprites to render
     int mNumSprite = 0;
+    //the health of the enemy
+    double health;
+    double healthmax;
+    
     //the type of the enemy
     std::string mType;
     
@@ -37,6 +41,8 @@ public:
     void move();
     //deal damage to the tower
     int doDamage();
+    //deal with the dam it take from the hero
+    void takeDamage(double dam);
     //show the enemy on
     void render();
     //Get the coordinates
@@ -60,7 +66,7 @@ private:
     //Position of the object
     double mPosX, mPosY;
     //The position where the enemy would stop
-    double stopX = 350;
+    double stopX = 330;
     //LTexture of the object
     LTexture* mLTexture = NULL;
     //renderer of the object

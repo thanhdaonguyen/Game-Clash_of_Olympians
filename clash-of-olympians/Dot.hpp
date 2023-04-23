@@ -11,6 +11,8 @@
 #include <stdio.h>
 #include "header1.hpp"
 #include "LTexture.hpp"
+#include "enemy.hpp"
+#include "Hero.hpp"
 
 
 class Dot {
@@ -29,12 +31,14 @@ public:
     double mAngle;
     //if the mouse is holding
     bool isHolding = false;
+    //the damage of the object
+    double mDam;
     //type
     std::string mType;
     
     //Constructor
-    Dot(int x, int y, SDL_Renderer*& renderer, std::string type, std::string img);
-    
+    Dot(int x, int y, SDL_Renderer*& renderer, std::string type, std::string img, Hero* user);
+    Dot(int x, int y, SDL_Renderer*& renderer, std::string type, std::string img, Enemy* user);
     //Destructor
     ~Dot();
     
@@ -67,9 +71,6 @@ public:
 private:
     //The X and Y offsets of the dot
     double mPosX, mPosY;
-    
-    //The x and y input
-    double mcPosX, mcPosY;
     
     //The velocity acording to coordinates of the dot
     double mVelX, mVelY;

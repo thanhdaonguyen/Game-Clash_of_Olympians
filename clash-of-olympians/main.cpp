@@ -6,8 +6,12 @@
 #include "Hero.hpp"
 #include "enemy.hpp"
 #include "SDLApp.hpp"
+#include "reward.hpp"
+
 
 using namespace std;
+
+
 
 //Screen dimension constants
 const int SCREEN_WIDTH = 1200;
@@ -63,18 +67,20 @@ bool checkRectCollisions(std::vector<SDL_Rect>& a, std::vector<SDL_Rect>& b) {
     return false;
 }
 
-//Check collisions of two vector of enemy and dot
-void checkCollisions(vector<Dot*> dotVec, vector<Enemy*> emVec) {
+//Handle collisions of two vector of enemy and dot
+void HandleCollisionsSpearAndEnemy(vector<Dot*> dotVec, vector<Enemy*> emVec) {
     for (int i = 0; i < dotVec.size(); i++) {
         for (int j = 0; j < emVec.size(); j++) {
             if (checkRectCollisions(dotVec[i]->mColliders, emVec[j]->mColliders)) {
                 dotVec[i]->isTouched = true;
-                emVec[j]->isTouched = true;
+                emVec[j]->takeDamage(dotVec[i]->mDam);
                 break;
             }
         }
     }
 }
+
+
 
 //Scene textures
 LTexture gBG(app->GetRenderer(),"assets/background.png");
@@ -95,15 +101,19 @@ Hero myHero(150,440,app->GetRenderer(),"assets/Shieldmaiden/4x/idle_1.png");
 vector<Dot*> dotVec;
 //the dots (bullet) of flying demon
 vector<Dot*> bulVec;
+//the reward vector
+vector<Reward*> rwdVec;
+
 
 //enemys
 vector<Enemy*> emVec;
-Enemy gob1(1280,620,app->GetRenderer(),"Goblin","assets/goblin/goblinsword.png");
-Enemy gob2(1350,620,app->GetRenderer(),"Goblin","assets/goblin/goblinsword.png");
-Enemy gob3(1460,620,app->GetRenderer(),"Goblin","assets/goblin/goblinsword.png");
+Enemy gob1(1280,600,app->GetRenderer(),"Goblin","assets/goblin/goblinsword.png");
+Enemy gob2(1350,600,app->GetRenderer(),"Goblin","assets/goblin/goblinsword.png");
+Enemy gob3(1460,600,app->GetRenderer(),"Goblin","assets/goblin/goblinsword.png");
 Enemy fly1(1590,250,app->GetRenderer(),"Flydemon","assets/flyingdemon.png");
 Enemy fly2(1700,300,app->GetRenderer(),"Flydemon","assets/flyingdemon.png");
 
+//function to add enemies to emVec
 void addToemVec() {
     emVec.push_back(&gob1);
     emVec.push_back(&fly1);
@@ -112,8 +122,8 @@ void addToemVec() {
     emVec.push_back(&gob3);
 }
 //The force bar
-SDL_Rect forcebarbound ={198, 548, 104, 14};
-SDL_Rect forcebar = {200, 550, 0, 10};
+SDL_Rect forcebarbound ={198, 548, 104, 12};
+SDL_Rect forcebar = {200, 550, 0, 8};
 bool forceHold = false;
 //the HP bar
 int HP = 100;
@@ -128,8 +138,23 @@ bool isPlaying = true;
 //the score mile stone
 Uint32 score = 0;
 Uint32 score0 = 0;
+//the reward timer
+int healthTimer = 0;
+int strengthTimer = 0;
 
 
+//Handle collisions of two vector of spear and reward
+void HandleCollisionsSpearAndReward(vector<Dot*> dotVec, vector<Reward*> rwdVec) {
+    for (int i = 0; i < dotVec.size(); i++) {
+        for (int j = 0; j < rwdVec.size(); j++) {
+            if (checkRectCollisions(dotVec[i]->mColliders, rwdVec[j]->mColliders)) {
+                rwdVec[i]->isTouched = true;
+                rwdVec[i]->giveReward(&myHero, HP);
+                break;
+            }
+        }
+    }
+}
 
 //###############################
 
@@ -144,12 +169,15 @@ void HandleEvent () {
             if( e.key.keysym.sym == SDLK_ESCAPE ) {
                 app->EndAppLoop();
             }
+            
+            //aim shots
             if( e.type == SDL_MOUSEBUTTONDOWN) {
-                dotVec.push_back(new Dot(180,420,app->GetRenderer(), "spear", "assets/spear.png"));
+                dotVec.push_back(new Dot(180,420,app->GetRenderer(), "spear", "assets/spear.png", &myHero));
                 forceHold = true;
                 myHero.isHolding = true;
             }
             
+            //fire
             if( e.type == SDL_MOUSEBUTTONUP) {
                 
                 forceHold = false;
@@ -163,6 +191,7 @@ void HandleEvent () {
                 
             }
             
+            //handle event for spears
             if (dotVec.size() != 0) (dotVec.back())->handleEvent(e);
         }
         
@@ -170,6 +199,28 @@ void HandleEvent () {
         // force bar
         if (forceHold && forcebar.w < 100) forcebar.w += 2;
         
+        //give reward
+        
+        if ((score/1000) % 10 == 0 && score/1000 > healthTimer) {
+            healthTimer = score/1000;
+            rwdVec.push_back(new Reward(rand() % 5 + 500, 0, "health", 20, app->GetRenderer(), "assets/heart.png") );
+        }
+        
+        if ((score/1000) % 15 == 0 && score/1000 > strengthTimer) {
+            strengthTimer = score/1000;
+            rwdVec.push_back(new Reward(rand() % 5 + 500, 0, "strength", 0.3, app->GetRenderer(), "assets/strength.png") );
+        }
+        
+        
+        //Erase the reward
+        int k3 = (int)rwdVec.size();
+        for (int i = k3 - 1; i >= 0; i--) {
+            if (rwdVec[i]->isTouched) {
+                delete rwdVec[i];
+                rwdVec.erase(rwdVec.begin() + i);
+                rwdVec.shrink_to_fit();
+            }
+        }
         
         //Check the dot vector to delete redundant dots
         int k = (int)dotVec.size();
@@ -181,7 +232,7 @@ void HandleEvent () {
             }
         }
         
-        //Check the bul vector to delete redundant dots
+        //Check the bullet vector to delete redundant dots
         int k2 = (int)bulVec.size();
         for (int i = k2 - 1; i >= 0; i--) {
             if (bulVec[i]->isTouched) {
@@ -196,7 +247,6 @@ void HandleEvent () {
         
         // move dots
         for (int i = 0; i < dotVec.size(); i++) {
-            
             dotVec[i]->move();
             dotVec[i]->changeAngle();
         }
@@ -213,23 +263,31 @@ void HandleEvent () {
             emVec[i]->move();
         }
         
+        //move reward
+        for (int i = 0; i < rwdVec.size(); i++) {
+            rwdVec[i]->move();
+        }
+        
         //deal damage
         for (int i = 0; i < emVec.size(); i++) {
             if (emVec[i]->isStop) {
                 if (emVec[i]->mType == "Goblin") HP -= emVec[i]->doDamage();
+                
                 else if (emVec[i]->mType == "Flydemon") {
                     emVec[i]->mTimer ++;
                     if (emVec[i]->mTimer % 60 == 0) {
                         emVec[i]->mTimer = 0;
-                        bulVec.push_back(new Dot(emVec[i]->getPosX(),emVec[i]->getPosY() + 5,app->GetRenderer(), "bullet" ,"assets/fireball/bubble_explo1.png"));
+                        bulVec.push_back(new Dot(emVec[i]->getPosX(),emVec[i]->getPosY() + 5,app->GetRenderer(), "bullet" ,"assets/fireball/bubble_explo1.png", emVec[i]));
                         bulVec.back()->setVel(-10,1);
+                        
                     }
                 }
             }
         }
         
         //check collisions
-        checkCollisions(dotVec, emVec);
+        HandleCollisionsSpearAndEnemy(dotVec, emVec);
+        HandleCollisionsSpearAndReward(dotVec, rwdVec);
     }
     
     else {
@@ -238,6 +296,7 @@ void HandleEvent () {
             if( e.key.keysym.sym == SDLK_q ) {
                 app->EndAppLoop();
             }
+            //User requests restart
             if( e.key.keysym.sym == SDLK_r ) {
                 gob1.setPos(1280,620);
                 gob2.setPos(1350,620);
@@ -250,6 +309,11 @@ void HandleEvent () {
                 HP = 100;
                 score = SDL_GetTicks();
                 score0 = SDL_GetTicks();
+                //delete bullets remain on the screen
+                for (int i = 0; i < bulVec.size(); i++) {
+                    bulVec[i]->isTouched = true;
+                }
+                
                 isPlaying = true;
             }
             
@@ -261,8 +325,6 @@ void HandleEvent () {
 
 //HANDLE ALL RENDERINGS
 void HandleRendering () {
-    
-    cout << bulVec.size() << endl;
     //Clear screen
     SDL_SetRenderDrawColor(app->GetRenderer(), 255, 255, 255, 255);
     SDL_RenderClear(app->GetRenderer());
@@ -284,11 +346,14 @@ void HandleRendering () {
         //        SDL_RenderFillRect(app->GetRenderer(), &emVec[i]->mColliders[0]);
         emVec[i]->render();
     }
-    //render bullet
+    //render bullets
     for (unsigned long i = 0; i < bulVec.size(); i++) {
         bulVec[i]->render();
     }
-    //render b
+    //render reward
+    for (unsigned long i = 0; i < rwdVec.size(); i++) {
+        rwdVec[i]->render();
+    }
     
     //render force bar
     SDL_SetRenderDrawColor(app->GetRenderer(), 140, 140, 140, 0); // set color to blue
@@ -304,6 +369,13 @@ void HandleRendering () {
     if (isPlaying == true) score = SDL_GetTicks();
     gScore.loadFromRenderedText(app->GetRenderer(), gFont, "Your score: " + to_string(int((score - score0)/1000)), scoreTextColor);
     gScore.render(app->GetRenderer(), 20, 5);
+    //render game guide
+    if (SDL_GetTicks() < 5000) {
+        scoreTextColor = { 255, 188, 0 };
+        gScore.loadFromRenderedText(app->GetRenderer(), gFont, "Press MOUSE on the screen to aim shots!", scoreTextColor);
+        gScore.render(app->GetRenderer(), (SCREEN_WIDTH/2 - gScore.getWidth()/2), (SCREEN_HEIGHT/2 - gScore.getHeight()/2));
+    }
+    
     //Play music
     if( Mix_PlayingMusic() == 0 ) Mix_PlayMusic( gMusic, -1 );
     
@@ -313,6 +385,7 @@ void HandleRendering () {
         isPlaying = false;
     }
     
+    //end game menu
     if (isPlaying == false) {
         scoreTextColor = { 255, 188, 0 };
         gScore.loadFromRenderedText(app->GetRenderer(), gFont, "YOU LOSE!", scoreTextColor);
@@ -349,6 +422,9 @@ void close() {
 
 
 int main( int argc, char* args[] ) {
+    
+    //create random seed
+    srand((unsigned int)time(NULL));
     
     //add enemy to emVec vector
     addToemVec();

@@ -38,9 +38,22 @@ Enemy::Enemy(int x, int y, SDL_Renderer*& renderer, std::string type, std::strin
         mVelY = 0;
     }
 
+    //initialize health
+    if (type == "Goblin") {
+        health = 6;
+        healthmax = 6;
+    }
+    if (type == "Flydemon") {
+        health = 7;
+        healthmax = 7;
+    }
+    
+    
     //Initialize type
     mType = type;
     
+    
+    //set colliders
     if (type == "Goblin") {
         mClip = {192, 193, 64, 64};
         //Create the necessary SDL_Rects
@@ -65,7 +78,6 @@ Enemy::Enemy(int x, int y, SDL_Renderer*& renderer, std::string type, std::strin
         shiftColliders();
     }
     
-    
 }
 
 Enemy::~Enemy() {
@@ -88,6 +100,8 @@ void Enemy::move() {
         mVelX = 0;
         mVelY = 0;
     }
+    
+    //if the object doesn't stop anymore
     if (isStop == false) {
         if (mType == "Goblin") {
             mVelX = -1.2;
@@ -97,9 +111,12 @@ void Enemy::move() {
         }
     }
     
+    //if the object is touched by spear or comes to the boundary)
     if ( isTouched ) {
+        //reset the state
         isTouched = false;
         isStop = false;
+        //reset the position
         if (mType == "Goblin") {
             mPosX = rand() % (1800 - 1300 + 1) + 1300;
             mVelX = -1.2;
@@ -109,9 +126,13 @@ void Enemy::move() {
             mPosY = rand() % (400 - 200 + 1) + 200;
             mVelX = -1.5;
         }
+        //reset the timer for doing dam
         mTimer = 0;
+        //reset the health
+        health = healthmax;
     }
     
+    //change mCount and mClip
     if (mType == "Goblin") {
         if (!isStop) {
             mClip.x = 64*(mCount/6);
@@ -144,10 +165,36 @@ int Enemy::doDamage() {
     }
     return 0;
 }
+
+void Enemy::takeDamage(double dam) {
+    health -= dam;
+    if (health < 0) health = 0;
+    if (health <= 0) {
+        isTouched = true;
+    }
+}
+
 void Enemy::render() {
     //Show the enemy on the screen
-    if (mType == "Goblin") mLTexture->render(mRenderer, mPosX, mPosY, &mClip, 1.3);
-    if (mType == "Flydemon") mLTexture->render(mRenderer, mPosX, mPosY, &mClip, 1.5);
+    
+    if (mType == "Goblin") {
+        SDL_Rect healthbarbound ={int(mPosX) + 40 - 1, int(mPosY) - 10 - 1, 20, 6};
+        SDL_Rect healthbar = {int(mPosX) + 40 , int(mPosY) - 10, int(health/healthmax*18), 4};
+        SDL_SetRenderDrawColor(mRenderer, 255, 255, 255, 255);
+        SDL_RenderFillRect(mRenderer, &healthbarbound);
+        SDL_SetRenderDrawColor(mRenderer, 255, 0, 0, 255);
+        SDL_RenderFillRect(mRenderer, &healthbar);
+        mLTexture->render(mRenderer, mPosX, mPosY, &mClip, 1.3);
+    }
+    if (mType == "Flydemon") {
+        SDL_Rect healthbarbound ={int(mPosX) + 25 - 1, int(mPosY) - 1, 20, 6};
+        SDL_Rect healthbar = {int(mPosX) + 25 , int(mPosY) , int(health/healthmax*18), 4};
+        SDL_SetRenderDrawColor(mRenderer, 255, 255, 255, 255);
+        SDL_RenderFillRect(mRenderer, &healthbarbound);
+        SDL_SetRenderDrawColor(mRenderer, 255, 0, 0, 255);
+        SDL_RenderFillRect(mRenderer, &healthbar);
+        mLTexture->render(mRenderer, mPosX, mPosY, &mClip, 1.5);
+    }
 }
 
 double Enemy::getPosY() {
@@ -162,6 +209,7 @@ void Enemy::setStop(double x) {
     stopX = x;
 }
 
+//change the position of colliders related to the position of the object
 void Enemy::shiftColliders() {
     if (mType == "Goblin") {
         mColliders[0].x = int(mPosX) + 37;

@@ -17,6 +17,7 @@
 		B8F7B4F529DFA18D007E33BE /* Dot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B8F7B4F029DFA18D007E33BE /* Dot.cpp */; };
 		B8F7B4F629DFA18D007E33BE /* LTexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B8F7B4F129DFA18D007E33BE /* LTexture.cpp */; };
 		B8F7B4F929DFBEA0007E33BE /* SDLApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B8F7B4F729DFBEA0007E33BE /* SDLApp.cpp */; };
+		B8FE462529E8FFD900F563DC /* reward.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B8FE462329E8FFD900F563DC /* reward.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -50,6 +51,8 @@
 		B8F7B4F129DFA18D007E33BE /* LTexture.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = LTexture.cpp; sourceTree = "<group>"; };
 		B8F7B4F729DFBEA0007E33BE /* SDLApp.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SDLApp.cpp; sourceTree = "<group>"; };
 		B8F7B4F829DFBEA0007E33BE /* SDLApp.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = SDLApp.hpp; sourceTree = "<group>"; };
+		B8FE462329E8FFD900F563DC /* reward.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = reward.cpp; sourceTree = "<group>"; };
+		B8FE462429E8FFD900F563DC /* reward.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = reward.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -94,12 +97,14 @@
 				B8F7B4F129DFA18D007E33BE /* LTexture.cpp */,
 				B8F7B4ED29DFA18D007E33BE /* main.cpp */,
 				B8F7B4F729DFBEA0007E33BE /* SDLApp.cpp */,
+				B8FE462329E8FFD900F563DC /* reward.cpp */,
 				B894F71A29DBC13D0026553A /* Dot.hpp */,
 				B894F71B29DBC13D0026553A /* header1.hpp */,
 				B894F71529DBC13D0026553A /* Hero.hpp */,
 				B894F71729DBC13D0026553A /* LTexture.hpp */,
 				B807FF3E29DBCAF200FA21C4 /* enemy.hpp */,
 				B8F7B4F829DFBEA0007E33BE /* SDLApp.hpp */,
+				B8FE462429E8FFD900F563DC /* reward.hpp */,
 			);
 			path = "clash-of-olympians";
 			sourceTree = "<group>";
@@ -177,6 +182,7 @@
 				B8F7B4F329DFA18D007E33BE /* enemy.cpp in Sources */,
 				B8F7B4F429DFA18D007E33BE /* Hero.cpp in Sources */,
 				B8F7B4F529DFA18D007E33BE /* Dot.cpp in Sources */,
+				B8FE462529E8FFD900F563DC /* reward.cpp in Sources */,
 				B8F7B4F629DFA18D007E33BE /* LTexture.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -20,6 +20,10 @@ public:
     bool isHolding = false;
     //throwing
     bool isThrow = false;
+    //the strength of the hero
+    double strength = 3;
+    
+    
     //Constructor
     
     Hero(int x, int y, SDL_Renderer*& renderer, std::string img);
