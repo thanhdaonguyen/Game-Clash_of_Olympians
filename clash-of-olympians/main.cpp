@@ -16,7 +16,7 @@ using namespace std;
 //Screen dimension constants
 const int SCREEN_WIDTH = 1200;
 const int SCREEN_HEIGHT = 700;
-const char* title = "Flappy Bird";
+const char* title = "CLASH OF OLYMPIANS";
 
 SDLApp* app = new SDLApp(IMG_INIT_PNG, title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT);
 //Starts up SDL and creates window
@@ -99,27 +99,28 @@ SDL_Event e;
 Hero myHero(150,440,app->GetRenderer(),"assets/Shieldmaiden/4x/idle_1.png");
 //the dots (weapons) that will be moving on the screen
 vector<Dot*> dotVec;
-//the dots (bullet) of flying demon
+//the dots (bullet) of flying demon and gordon
 vector<Dot*> bulVec;
 //the reward vector
 vector<Reward*> rwdVec;
-
-
 //enemys
 vector<Enemy*> emVec;
+
 Enemy gob1(1280,600,app->GetRenderer(),"Goblin","assets/goblin/goblinsword.png");
 Enemy gob2(1350,600,app->GetRenderer(),"Goblin","assets/goblin/goblinsword.png");
 Enemy gob3(1460,600,app->GetRenderer(),"Goblin","assets/goblin/goblinsword.png");
 Enemy fly1(1590,250,app->GetRenderer(),"Flydemon","assets/flyingdemon.png");
 Enemy fly2(1700,300,app->GetRenderer(),"Flydemon","assets/flyingdemon.png");
-
+Enemy gor1(800,610,app->GetRenderer(),"Shadow","assets/boss/shadow-80x70.png");
 //function to add enemies to emVec
 void addToemVec() {
+    emVec.push_back(&gor1);
     emVec.push_back(&gob1);
     emVec.push_back(&fly1);
     emVec.push_back(&gob2);
     emVec.push_back(&fly2);
     emVec.push_back(&gob3);
+    
 }
 //The force bar
 SDL_Rect forcebarbound ={198, 548, 104, 12};
@@ -151,8 +152,8 @@ void HandleCollisionsSpearAndReward(vector<Dot*> dotVec, vector<Reward*> rwdVec)
     for (int i = 0; i < dotVec.size(); i++) {
         for (int j = 0; j < rwdVec.size(); j++) {
             if (checkRectCollisions(dotVec[i]->mColliders, rwdVec[j]->mColliders)) {
-                rwdVec[i]->isTouched = true;
-                rwdVec[i]->giveReward(&myHero, HP);
+                rwdVec[j]->giveReward(&myHero, HP);
+                rwdVec[j]->isTouched = true;
                 break;
             }
         }
@@ -164,7 +165,7 @@ void HandleCollisionsSpearAndReward(vector<Dot*> dotVec, vector<Reward*> rwdVec)
 
 //HANDLE ALL EVENTS
 void HandleEvent () {
-    
+    cout << rwdVec.size() << endl;
     if (isMenu) {
         while( SDL_PollEvent( &e ) != 0 ) {
             
@@ -175,9 +176,11 @@ void HandleEvent () {
                 gob3.setPos(1460,620); gob3.health = gob3.healthmax;
                 fly1.setPos(1590,250); fly1.health = fly1.healthmax;
                 fly2.setPos(1700,300); fly2.health = fly2.healthmax;
+                gor1.setPos(800,610); gor1.health = gor1.healthmax;
                 
                 for (int i = 0; i < emVec.size(); i++) {
                     emVec[i]->isStop = false;
+                    emVec[i]->mCount = 0;
                 }
                 HP = 100;
                 score = SDL_GetTicks();
@@ -241,12 +244,12 @@ void HandleEvent () {
         
         //give reward
         
-        if ((score/1000) % 10 == 0 && score/1000 > healthTimer) {
+        if ((score/1000) % 13 == 0 && score/1000 > healthTimer) {
             healthTimer = score/1000;
             rwdVec.push_back(new Reward(rand() % 5 + 500, 0, "health", 20, app->GetRenderer(), "assets/heart.png") );
         }
         
-        if ((score/1000) % 15 == 0 && score/1000 > strengthTimer) {
+        if ((score/1000) % 19 == 0 && score/1000 > strengthTimer) {
             strengthTimer = score/1000;
             rwdVec.push_back(new Reward(rand() % 5 + 500, 0, "strength", 0.3, app->GetRenderer(), "assets/strength.png") );
         }
@@ -322,6 +325,15 @@ void HandleEvent () {
                         
                     }
                 }
+                else if (emVec[i]->mType == "Shadow") {
+                    emVec[i]->mTimer ++;
+                    if (emVec[i]->mTimer % 100 == 0) {
+                        emVec[i]->mTimer = 0;
+                        bulVec.push_back(new Dot(emVec[i]->getPosX(),emVec[i]->getPosY() + 5,app->GetRenderer(), "bullet" ,"assets/fireball/bubble_explo1.png", emVec[i]));
+                        bulVec.back()->setVel(-15,-15);
+                        
+                    }
+                }
             }
         }
         
@@ -333,6 +345,7 @@ void HandleEvent () {
         if (HP <= 0) {
             HP = 0;
             isPlaying = false;
+            isMenu = true;
         }
     }
     
@@ -349,6 +362,7 @@ void HandleEvent () {
                 gob3.setPos(1460,620); gob3.health = gob3.healthmax;
                 fly1.setPos(1590,250); fly1.health = fly1.healthmax;
                 fly2.setPos(1700,300); fly2.health = fly2.healthmax;
+                gor1.setPos(800,610); gor1.health = gor1.healthmax;
                 
                 for (int i = 0; i < emVec.size(); i++) {
                     emVec[i]->isStop = false;
@@ -397,7 +411,7 @@ void HandleRendering () {
         scoreTextColor = { 255, 188, 0 };
         gScore.loadFromRenderedText(app->GetRenderer(), gFont, "CLASH OF OLYMPIANS", scoreTextColor);
         gScore.render(app->GetRenderer(), (SCREEN_WIDTH/2 - gScore.getWidth()/2), (SCREEN_HEIGHT/2 - gScore.getHeight()/2));
-        gScore.loadFromRenderedText(app->GetRenderer(), gFont, "Press P to play game, H to show restart", scoreTextColor);
+        gScore.loadFromRenderedText(app->GetRenderer(), gFont, "Press P to play game, H to show high score", scoreTextColor);
         gScore.render(app->GetRenderer(), (SCREEN_WIDTH/2 - gScore.getWidth()/2), (SCREEN_HEIGHT/2 - gScore.getHeight()/2) + 50);
     }
     

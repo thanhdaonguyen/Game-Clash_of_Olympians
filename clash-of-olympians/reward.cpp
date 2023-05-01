@@ -10,6 +10,9 @@
 
 //the constructor
 Reward::Reward(int x, int y, std::string type, double value, SDL_Renderer*& renderer, std::string img) {
+    //set type
+    mType = type;
+    
     //get the hero's position
     mPosX = x;
     mPosY = y;
@@ -17,6 +20,10 @@ Reward::Reward(int x, int y, std::string type, double value, SDL_Renderer*& rend
     //set the velocities
     mVelX = 0;
     mVelY = 1;
+    
+    //set initial reward
+    mHealth = 0;
+    mStrength = 0;
     
     //Set mLTexture
     mLTexture = new LTexture;
@@ -58,9 +65,15 @@ void Reward::render() {
 }
 
 void Reward::giveReward(Hero* mHero, int& HP) {
-    mHero->strength += mStrength;
-    if(mStrength != 0) mHero->speed += 0.2;
-    HP += mHealth;
+    
+    if(mType == "health") {
+        HP += 20;
+    }
+    
+    if(mType == "strength") {
+        mHero->strength += 0.3;
+        mHero->speed += 0.2;
+    }
 }
 
 void Reward::shiftColliders() {

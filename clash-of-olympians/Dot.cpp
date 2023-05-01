@@ -148,10 +148,10 @@ void Dot::move() {
             //mPosX -= mVelX;
             isTouched = true;
         }
-        if (mPosY > SCREEN_HEIGHT - 200) {
-            //move back
-            isTouched = true;
-        }
+//        if (mPosY > SCREEN_HEIGHT - 200) {
+//            //move back
+//            isTouched = true;
+//        }
     }
 }
 

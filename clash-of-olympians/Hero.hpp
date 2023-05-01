@@ -24,10 +24,8 @@ public:
     double strength = 3;
     //speed
     double speed = 1;
-    
-    
+   
     //Constructor
-    
     Hero(int x, int y, SDL_Renderer*& renderer, std::string img);
     //Destructor
     ~Hero();

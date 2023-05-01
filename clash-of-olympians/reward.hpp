@@ -18,12 +18,16 @@
 class Reward {
 public:
     
+    //type
+    std::string mType;
+    //
     double maxVel;
     //logic value to check if the reward is earned
     bool isTouched = false;
     //all the value that the reward carry
-    double mStrength = 0;
-    double mHealth = 0;
+    double mStrength;
+    double mHealth;
+    
     
 
     //the constructor

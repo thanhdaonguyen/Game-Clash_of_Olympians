@@ -27,6 +27,9 @@ Enemy::Enemy(int x, int y, SDL_Renderer*& renderer, std::string type, std::strin
     if (type == "Flydemon") {
         mDam = 5;
     }
+    if (type == "Shadow") {
+        mDam = 5;
+    }
     
     //Initialize the velocity
     if (type == "Goblin") {
@@ -35,6 +38,10 @@ Enemy::Enemy(int x, int y, SDL_Renderer*& renderer, std::string type, std::strin
     }
     if (type == "Flydemon") {
         mVelX = -1.5;
+        mVelY = 0;
+    }
+    if (type == "Shadow") {
+        mVelX = 0;
         mVelY = 0;
     }
 
@@ -46,6 +53,10 @@ Enemy::Enemy(int x, int y, SDL_Renderer*& renderer, std::string type, std::strin
     if (type == "Flydemon") {
         health = 7;
         healthmax = 7;
+    }
+    if (type == "Shadow") {
+        health = 10;
+        healthmax = 10;
     }
     
     
@@ -74,6 +85,15 @@ Enemy::Enemy(int x, int y, SDL_Renderer*& renderer, std::string type, std::strin
         
         mColliders[1].w = 46;
         mColliders[1].w = 64;
+        
+        shiftColliders();
+    }
+    if (type == "Shadow") {
+        mClip = {0, 0, 80, 70};
+        //Create the necessary SDL_Rects
+        mColliders.resize(1);
+        mColliders[0].w = 80;
+        mColliders[0].h = 70;
         
         shiftColliders();
     }
@@ -126,10 +146,13 @@ void Enemy::move() {
             mPosY = rand() % (400 - 200 + 1) + 200;
             mVelX = -1.5;
         }
+
         //reset the timer for doing dam
         mTimer = 0;
         //reset the health
         health = healthmax;
+        //reset mCount for rendering
+        mCount = 0;
     }
     
     //change mCount and mClip
@@ -151,6 +174,23 @@ void Enemy::move() {
         mCount --;
         if (mCount < 0) mCount = 6*6-1;
     }
+    
+    if (mType == "Shadow") {
+        if (!isStop) {
+            mClip.x = 80*((mCount%24)/6);
+            mClip.y = 70*(mCount/24);
+            mCount++;
+            if (mCount == 84) {
+                isStop = true;
+                mCount = 0;
+                mClip.y = 280;
+            }
+        }
+        else {
+            mClip.x = 80*((mCount%24)/6);
+            mCount++;
+        }
+    }
 }
 int Enemy::doDamage() {
     if (mType == "Goblin") {
@@ -161,6 +201,9 @@ int Enemy::doDamage() {
         }
     }
     if (mType == "Flydemon") {
+        return mDam;
+    }
+    if (mType == "Shadow") {
         return mDam;
     }
     return 0;
@@ -195,6 +238,15 @@ void Enemy::render() {
         SDL_RenderFillRect(mRenderer, &healthbar);
         mLTexture->render(mRenderer, mPosX, mPosY, &mClip, 1.5);
     }
+    if (mType == "Shadow") {
+        SDL_Rect healthbarbound ={int(mPosX) + 25 - 1, int(mPosY) - 1, 20, 6};
+        SDL_Rect healthbar = {int(mPosX) + 25 , int(mPosY) , int(health/healthmax*18), 4};
+        SDL_SetRenderDrawColor(mRenderer, 255, 255, 255, 255);
+        SDL_RenderFillRect(mRenderer, &healthbarbound);
+        SDL_SetRenderDrawColor(mRenderer, 255, 0, 0, 255);
+        SDL_RenderFillRect(mRenderer, &healthbar);
+        mLTexture->render(mRenderer, mPosX, mPosY, &mClip, 1);
+    }
 }
 
 double Enemy::getPosY() {
@@ -220,6 +272,10 @@ void Enemy::shiftColliders() {
         mColliders[0].y = int(mPosY) + 19;
         mColliders[1].x = int(mPosX) + 30;
         mColliders[1].y = int(mPosY) + 50;
+    }
+    if (mType == "Shadow") {
+        mColliders[0].x = int(mPosX);
+        mColliders[0].y = int(mPosY);
     }
 }
 
