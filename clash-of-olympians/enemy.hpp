@@ -57,6 +57,8 @@ public:
     //check if the enemy approached close enough or be touched
     bool isStop = false;
     bool isTouched = false;
+    //check if flydemon is hovering
+    bool isHovering = false;
     //Dot's collision boxes
     std::vector<SDL_Rect> mColliders;
     //clip

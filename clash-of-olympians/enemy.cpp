@@ -28,7 +28,7 @@ Enemy::Enemy(int x, int y, SDL_Renderer*& renderer, std::string type, std::strin
         mDam = 5;
     }
     if (type == "Shadow") {
-        mDam = 5;
+        mDam = 6;
     }
     
     //Initialize the velocity
@@ -110,6 +110,12 @@ void Enemy::move() {
     mPosY += mVelY;
     //change the colliders' positions
     shiftColliders();
+    
+    if (isHovering) {
+        if ((mTimer/73) % 2 == 0) mVelY = 1;
+        if ((mTimer/73) % 2 == 1) mVelY = -1;
+        mTimer++;
+    }
     
     //If the enemy is close enough, it will stop
     if ( mPosX < stopX ) {

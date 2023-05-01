@@ -11,8 +11,6 @@
 
 using namespace std;
 
-
-
 //Screen dimension constants
 const int SCREEN_WIDTH = 1200;
 const int SCREEN_HEIGHT = 700;
@@ -80,8 +78,6 @@ void HandleCollisionsSpearAndEnemy(vector<Dot*> dotVec, vector<Enemy*> emVec) {
     }
 }
 
-
-
 //Scene textures
 LTexture gBG(app->GetRenderer(),"assets/background.png");
 LTexture gHPTexture(app->GetRenderer());
@@ -106,22 +102,84 @@ vector<Reward*> rwdVec;
 //enemys
 vector<Enemy*> emVec;
 
-Enemy gob1(1280,600,app->GetRenderer(),"Goblin","assets/goblin/goblinsword.png");
-Enemy gob2(1350,600,app->GetRenderer(),"Goblin","assets/goblin/goblinsword.png");
-Enemy gob3(1460,600,app->GetRenderer(),"Goblin","assets/goblin/goblinsword.png");
-Enemy fly1(1590,250,app->GetRenderer(),"Flydemon","assets/flyingdemon.png");
-Enemy fly2(1700,300,app->GetRenderer(),"Flydemon","assets/flyingdemon.png");
-Enemy gor1(800,610,app->GetRenderer(),"Shadow","assets/boss/shadow-80x70.png");
 //function to add enemies to emVec
-void addToemVec() {
-    emVec.push_back(&gor1);
-    emVec.push_back(&gob1);
-    emVec.push_back(&fly1);
-    emVec.push_back(&gob2);
-    emVec.push_back(&fly2);
-    emVec.push_back(&gob3);
+void addToemVec(int score, int preScore) {
+    cout << score << endl;
+    if (score < 10) {
+        if (score % 3 == 0 && score > preScore) {
+            emVec.push_back(new Enemy(1280,600,app->GetRenderer(),"Goblin","assets/goblin/goblinsword.png"));
+        }
+    }
+    else if (10 <= score && score < 25) {
+        if (score % 5 == 0 && score > preScore) {
+            emVec.push_back(new Enemy(1280,600,app->GetRenderer(),"Goblin","assets/goblin/goblinsword.png"));
+            emVec.push_back(new Enemy(1590,250,app->GetRenderer(),"Flydemon","assets/flyingdemon.png"));
+        }
+    }
+    else if (25 <= score && score < 50) {
+        if (score % 5 == 0 && score > preScore) {
+            emVec.push_back(new Enemy(1280,600,app->GetRenderer(),"Goblin","assets/goblin/goblinsword.png"));
+            emVec.push_back(new Enemy(1590,250,app->GetRenderer(),"Flydemon","assets/flyingdemon.png"));
+            emVec.back()->isHovering = true;
+        }
+    }
+    else {
+        if (score % 5 == 0 && score > preScore) {
+            emVec.push_back(new Enemy(1280,600,app->GetRenderer(),"Goblin","assets/goblin/goblinsword.png"));
+            emVec.push_back(new Enemy(1590,250,app->GetRenderer(),"Flydemon","assets/flyingdemon.png"));
+            emVec.back()->isHovering = true;
+        }
+        if (score % 12 == 0 && score > preScore) {
+            emVec.push_back(new Enemy(800,610,app->GetRenderer(),"Shadow","assets/boss/shadow-80x70.png"));
+        }
+    }
+//    emVec.push_back(new Enemy(1280,600,app->GetRenderer(),"Goblin","assets/goblin/goblinsword.png"));
+//    emVec.push_back(new Enemy(1350,600,app->GetRenderer(),"Goblin","assets/goblin/goblinsword.png"));
+//    emVec.push_back(new Enemy(1460,600,app->GetRenderer(),"Goblin","assets/goblin/goblinsword.png"));
+//    emVec.push_back(new Enemy(1590,250,app->GetRenderer(),"Flydemon","assets/flyingdemon.png"));
+//    emVec.push_back(new Enemy(1700,300,app->GetRenderer(),"Flydemon","assets/flyingdemon.png"));
+//    emVec.push_back(new Enemy(800,610,app->GetRenderer(),"Shadow","assets/boss/shadow-80x70.png"));
     
 }
+//function to delete all enemies
+void deleteEmVec() {
+    int k4 = (int)emVec.size();
+    for (int i = k4 - 1; i >= 0; i--) {
+        delete emVec[i];
+        emVec.erase(emVec.begin() + i);
+        emVec.shrink_to_fit();
+        
+    }
+}
+//function to delete all spear
+void deleteSpear() {
+    int k4 = (int)dotVec.size();
+    for (int i = k4 - 1; i >= 0; i--) {
+        delete dotVec[i];
+        dotVec.erase(dotVec.begin() + i);
+        dotVec.shrink_to_fit();
+    }
+}
+//function to delete all bullet from demons
+void deleteBulVec() {
+    int k4 = (int)bulVec.size();
+    for (int i = k4 - 1; i >= 0; i--) {
+        delete bulVec[i];
+        bulVec.erase(bulVec.begin() + i);
+        bulVec.shrink_to_fit();
+        
+    }
+}
+//function to delete all rewards
+void deleteRwdVec() {
+    int k4 = (int)rwdVec.size();
+    for (int i = k4 - 1; i >= 0; i--) {
+        delete rwdVec[i];
+        rwdVec.erase(rwdVec.begin() + i);
+        rwdVec.shrink_to_fit();
+    }
+}
+
 //The force bar
 SDL_Rect forcebarbound ={198, 548, 104, 12};
 SDL_Rect forcebar = {200, 550, 0, 8};
@@ -140,12 +198,19 @@ bool isMenu = true;
 bool isHighscore = false;
 bool isPause = false;
 //the score mile stone
-Uint32 score = 0;
-Uint32 score0 = 0;
+Uint32 scoreTimer = 0;
+Uint32 scoreTimer0 = 0;
+//the score
+int score = 0;
+int preScore = 0;
+//variables for time compensation
+Uint32 timeCompen1;
+Uint32 timeCompen2;
 //the reward timer
 int healthTimer = 0;
 int strengthTimer = 0;
-
+//count variable for generating enemies
+int countGenerateEnemies = 0;
 
 //Handle collisions of two vector of spear and reward
 void HandleCollisionsSpearAndReward(vector<Dot*> dotVec, vector<Reward*> rwdVec) {
@@ -165,38 +230,40 @@ void HandleCollisionsSpearAndReward(vector<Dot*> dotVec, vector<Reward*> rwdVec)
 
 //HANDLE ALL EVENTS
 void HandleEvent () {
-    cout << rwdVec.size() << endl;
     if (isMenu) {
         while( SDL_PollEvent( &e ) != 0 ) {
             
             //User requests play game
+            if (e.key.keysym.sym == SDLK_q) {
+                app->EndAppLoop();
+            }
             if( e.key.keysym.sym == SDLK_p ) {
-                gob1.setPos(1280,620); gob1.health = gob1.healthmax;
-                gob2.setPos(1350,620); gob2.health = gob2.healthmax;
-                gob3.setPos(1460,620); gob3.health = gob3.healthmax;
-                fly1.setPos(1590,250); fly1.health = fly1.healthmax;
-                fly2.setPos(1700,300); fly2.health = fly2.healthmax;
-                gor1.setPos(800,610); gor1.health = gor1.healthmax;
+
+//                //reset enemies
+//                addToemVec(score, preScore);
+//                //reset enemies' states
+//                for (int i = 0; i < emVec.size(); i++) {
+//                    emVec[i]->isStop = false;
+//                    emVec[i]->mCount = 0;
+//                }
                 
-                for (int i = 0; i < emVec.size(); i++) {
-                    emVec[i]->isStop = false;
-                    emVec[i]->mCount = 0;
-                }
-                HP = 100;
-                score = SDL_GetTicks();
-                score0 = SDL_GetTicks();
                 //delete bullets remain on the screen
-                for (int i = 0; i < bulVec.size(); i++) {
-                    bulVec[i]->isTouched = true;
-                }
-                //delette rewards remain on the screen
-                for (int i = 0; i < rwdVec.size(); i++) {
-                    rwdVec[i]->isTouched = true;
-                }
+                deleteBulVec();
+                
+                //delete spears remain on the screen
+                deleteSpear();
+                
+                //delete rewards remain on the screen
+                deleteRwdVec();
                 //reset hero's abilities
                 myHero.speed = 1;
                 myHero.strength = 3;
                 
+                //reset score and HP
+                HP = 100;
+                scoreTimer = SDL_GetTicks();
+                scoreTimer0 = SDL_GetTicks();
+                //reset state
                 isPlaying = true;
                 isMenu = false;
             }
@@ -208,6 +275,7 @@ void HandleEvent () {
         while( SDL_PollEvent( &e ) != 0 ) {
             //User requests quit
             if( e.key.keysym.sym == SDLK_ESCAPE ) {
+                timeCompen1 = SDL_GetTicks();
                 isPlaying = false;
                 isPause = true;
             }
@@ -238,24 +306,28 @@ void HandleEvent () {
             if (dotVec.size() != 0) (dotVec.back())->handleEvent(e);
         }
         
+        //set score
+        preScore = score;
+        scoreTimer = SDL_GetTicks();
+        score = (int)(scoreTimer - scoreTimer0)/1000;
+        
+        //add enemies
+        addToemVec(score, preScore);
         
         // force bar
         if (forceHold && forcebar.w < 100) forcebar.w += 2;
         
         //give reward
-        
-        if ((score/1000) % 13 == 0 && score/1000 > healthTimer) {
-            healthTimer = score/1000;
+        if (score % 13 == 0 && score > preScore) {
             rwdVec.push_back(new Reward(rand() % 5 + 500, 0, "health", 20, app->GetRenderer(), "assets/heart.png") );
         }
         
-        if ((score/1000) % 19 == 0 && score/1000 > strengthTimer) {
-            strengthTimer = score/1000;
+        if (score % 19 == 0 && score > preScore) {
             rwdVec.push_back(new Reward(rand() % 5 + 500, 0, "strength", 0.3, app->GetRenderer(), "assets/strength.png") );
         }
         
         
-        //Erase the reward
+        //Erase the rewards that are touched
         int k3 = (int)rwdVec.size();
         for (int i = k3 - 1; i >= 0; i--) {
             if (rwdVec[i]->isTouched) {
@@ -285,6 +357,15 @@ void HandleEvent () {
                 bulVec.shrink_to_fit();
             }
         }
+        //Delete enemies that are eliminated
+        int k4 = (int)emVec.size();
+        for (int i = k4 - 1; i >= 0; i--) {
+            if (emVec[i]->isTouched) {
+                delete emVec[i];
+                emVec.erase(emVec.begin() + i);
+                emVec.shrink_to_fit();
+            }
+        }
 
         
         
@@ -300,7 +381,6 @@ void HandleEvent () {
             bulVec[i]->changeAngle();
         }
        
-        
         //move enemys
         for (int i = 0; i < emVec.size(); i++) {
             emVec[i]->move();
@@ -344,6 +424,10 @@ void HandleEvent () {
         //end game
         if (HP <= 0) {
             HP = 0;
+            deleteEmVec();
+            deleteSpear();
+            deleteRwdVec();
+            deleteBulVec();
             isPlaying = false;
             isMenu = true;
         }
@@ -357,36 +441,30 @@ void HandleEvent () {
             }
             //User requests restart
             if( e.key.keysym.sym == SDLK_r ) {
-                gob1.setPos(1280,620); gob1.health = gob1.healthmax;
-                gob2.setPos(1350,620); gob2.health = gob2.healthmax;
-                gob3.setPos(1460,620); gob3.health = gob3.healthmax;
-                fly1.setPos(1590,250); fly1.health = fly1.healthmax;
-                fly2.setPos(1700,300); fly2.health = fly2.healthmax;
-                gor1.setPos(800,610); gor1.health = gor1.healthmax;
                 
-                for (int i = 0; i < emVec.size(); i++) {
-                    emVec[i]->isStop = false;
-                }
-                HP = 100;
-                score = SDL_GetTicks();
-                score0 = SDL_GetTicks();
                 //delete bullets remain on the screen
-                for (int i = 0; i < bulVec.size(); i++) {
-                    bulVec[i]->isTouched = true;
-                }
+                deleteBulVec();
                 //delette rewards remain on the screen
-                for (int i = 0; i < rwdVec.size(); i++) {
-                    rwdVec[i]->isTouched = true;
-                }
+                deleteRwdVec();
+                //delete spears
+                deleteSpear();
+                //delete old enemies
+                deleteEmVec();
+                
                 //reset hero's abilities
                 myHero.speed = 1;
                 myHero.strength = 3;
-                
+                //reset game state
+                HP = 100;
+                scoreTimer = SDL_GetTicks();
+                scoreTimer0 = SDL_GetTicks();
                 isPlaying = true;
                 isPause = false;
             }
             //User requests continue
             if( e.key.keysym.sym == SDLK_c ) {
+                timeCompen2 = SDL_GetTicks();
+                scoreTimer0 += timeCompen2 - timeCompen1;
                 isPlaying = true;
                 isPause = false;
             }
@@ -411,7 +489,7 @@ void HandleRendering () {
         scoreTextColor = { 255, 188, 0 };
         gScore.loadFromRenderedText(app->GetRenderer(), gFont, "CLASH OF OLYMPIANS", scoreTextColor);
         gScore.render(app->GetRenderer(), (SCREEN_WIDTH/2 - gScore.getWidth()/2), (SCREEN_HEIGHT/2 - gScore.getHeight()/2));
-        gScore.loadFromRenderedText(app->GetRenderer(), gFont, "Press P to play game, H to show high score", scoreTextColor);
+        gScore.loadFromRenderedText(app->GetRenderer(), gFont, "Press P to play game, H to show high score, Q to quit game", scoreTextColor);
         gScore.render(app->GetRenderer(), (SCREEN_WIDTH/2 - gScore.getWidth()/2), (SCREEN_HEIGHT/2 - gScore.getHeight()/2) + 50);
     }
     
@@ -458,11 +536,10 @@ void HandleRendering () {
         gHPTexture.loadFromRenderedText(app->GetRenderer(), gFont, to_string(HP), scoreTextColor);
         gHPTexture.render(app->GetRenderer(), 75, 55);
         //Render score to the screen
-        if (isPlaying == true) score = SDL_GetTicks();
-        gScore.loadFromRenderedText(app->GetRenderer(), gFont, "Your score: " + to_string(int((score - score0)/1000)), scoreTextColor);
+        gScore.loadFromRenderedText(app->GetRenderer(), gFont, "Your score: " + to_string(score), scoreTextColor);
         gScore.render(app->GetRenderer(), 20, 5);
         //render game guide
-        if ((score - score0)/1000 < 5) {
+        if (score < 5) {
             scoreTextColor = { 255, 188, 0 };
             gScore.loadFromRenderedText(app->GetRenderer(), gFont, "Press MOUSE on the screen to aim shots!", scoreTextColor);
             gScore.render(app->GetRenderer(), (SCREEN_WIDTH/2 - gScore.getWidth()/2), (SCREEN_HEIGHT/2 - gScore.getHeight()/2));
@@ -508,6 +585,11 @@ void close() {
     
     //delete dynamically allocated objects
     delete app;
+    deleteEmVec();
+    deleteSpear();
+    deleteBulVec();
+    deleteRwdVec();
+    
 }
 
 
@@ -518,7 +600,6 @@ int main( int argc, char* args[] ) {
     srand((unsigned int)time(NULL));
     
     //add enemy to emVec vector
-    addToemVec();
     //set function for app
     app->SetEventCallback(HandleEvent);
     app->SetRenderCallback(HandleRendering);
