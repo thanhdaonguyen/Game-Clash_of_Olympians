@@ -96,6 +96,7 @@ enum {
     RESTART_BUTTON,
     CONTINUE_BUTTON,
     BACK_BUTTON,
+    PAUSE_BUTTON,
 };
 
 int buttonState = NONE_BUTTON;
@@ -220,6 +221,48 @@ Uint32 scoreTimer0 = 0;
 //the score
 int score = 0;
 int preScore = 0;
+//the highscore
+
+vector<int> hScoreVec;
+void readHighScoreFromFile() {
+    ifstream fin("assets/highscore.txt");
+    hScoreVec.clear();
+    string line;
+    for (int i = 0; i < 3; i++) {
+        getline(fin, line);
+        int temp = stoi(line);
+//        cout << temp << ' ';
+        hScoreVec.push_back(temp);
+    }
+    sort(hScoreVec.begin(), hScoreVec.end(), [](int a, int b) {
+            return a > b;
+        });
+}
+void writeHighScoreToFile() {
+    
+    ofstream fout("assets/highscore.txt");
+    for (int i = 0; i < 3; i++) {
+        fout << hScoreVec[i] << endl;
+    }
+    fout.close();
+    
+    ifstream fin("assets/highscore.txt");
+    for (int i = 0; i < 3; i++) {
+        string line;
+        getline(fin, line);
+    }
+
+}
+void addNewScore(int score) {
+    hScoreVec.push_back(score);
+    cout << score << endl;
+    sort(hScoreVec.begin(), hScoreVec.end(), [](int a, int b) {
+            return a > b;
+        });
+    writeHighScoreToFile();
+    readHighScoreFromFile();
+}
+
 //variables for time compensation
 Uint32 timeCompen1;
 Uint32 timeCompen2;
@@ -303,13 +346,21 @@ void HandleEvent () {
     }
     
     if (isPlaying) {
+        
+        buttonState = NONE_BUTTON;
+        int x, y;
+        SDL_GetMouseState(&x, &y);
+        if (1120 < x && x < 1180) {
+            if (20 < y && y < 80) buttonState = PAUSE_BUTTON;
+        }
         //Handle events on queue
         while( SDL_PollEvent( &e ) != 0 ) {
             //User requests quit
-            if( e.key.keysym.sym == SDLK_ESCAPE ) {
+            if( e.type == SDL_MOUSEBUTTONDOWN && buttonState == PAUSE_BUTTON ) {
                 timeCompen1 = SDL_GetTicks();
                 isPlaying = false;
                 isPause = true;
+                continue;
             }
             
             //aim shots
@@ -456,7 +507,7 @@ void HandleEvent () {
         //end game
         if (HP <= 0) {
             HP = 0;
-            
+            addNewScore(score);
             isPlaying = false;
             isDied = true;
         }
@@ -481,6 +532,7 @@ void HandleEvent () {
             //User requests restart
             if( e.type == SDL_MOUSEBUTTONUP && buttonState == RESTART_BUTTON ) {
                 
+                addNewScore(score);
                 //delete bullets remain on the screen
                 deleteBulVec();
                 //delette rewards remain on the screen
@@ -509,6 +561,15 @@ void HandleEvent () {
             }
             
             if( e.type == SDL_MOUSEBUTTONUP && buttonState == MENU_BUTTON ) {
+                addNewScore(score);
+                //delete bullets remain on the screen
+                deleteBulVec();
+                //delette rewards remain on the screen
+                deleteRwdVec();
+                //delete spears
+                deleteSpear();
+                //delete old enemies
+                deleteEmVec();
                 isMenu = true;
                 isPause = false;
             }
@@ -726,6 +787,13 @@ void HandleRendering () {
         //Render score to the screen
         gScore.loadFromRenderedText(app->GetRenderer(), gFont, "Your score: " + to_string(score), scoreTextColor);
         gScore.render(app->GetRenderer(), 20, 5);
+        //render pause button
+        //render button
+        double a = 1;
+        if (buttonState == PAUSE_BUTTON) a = 1.1;
+        
+        gButton.loadFromFile(app->GetRenderer(), "assets/button/pause2.png");
+        gButton.render(app->GetRenderer(), (SCREEN_WIDTH - 50 - gButton.getWidth()*a/2), (50 - gButton.getHeight()*a/2), NULL, a);
         //render game guide
         if (score < 5) {
             scoreTextColor = { 255, 188, 0 };
@@ -813,11 +881,11 @@ void HandleRendering () {
         gButton.loadFromFile(app->GetRenderer(), "assets/tabletemplate.jpg");
         gButton.render(app->GetRenderer(),(SCREEN_WIDTH - gButton.getWidth())/2, (SCREEN_HEIGHT - gButton.getHeight())/2);
         
-        gScore.loadFromRenderedText(app->GetRenderer(), gFont, "1st place:     000", scoreTextColor);
+        gScore.loadFromRenderedText(app->GetRenderer(), gFont, "1st place:     " + to_string(hScoreVec[0]), scoreTextColor);
         gScore.render(app->GetRenderer(), (SCREEN_WIDTH/2 - gScore.getWidth()/2), (SCREEN_HEIGHT/2 - gScore.getHeight()/2) -80);
-        gScore.loadFromRenderedText(app->GetRenderer(), gFont, "2nd place:     000", scoreTextColor);
+        gScore.loadFromRenderedText(app->GetRenderer(), gFont, "2nd place:     " + to_string(hScoreVec[1]), scoreTextColor);
         gScore.render(app->GetRenderer(), (SCREEN_WIDTH/2 - gScore.getWidth()/2), (SCREEN_HEIGHT/2 - gScore.getHeight()/2) -30);
-        gScore.loadFromRenderedText(app->GetRenderer(), gFont, "3th place:     000", scoreTextColor);
+        gScore.loadFromRenderedText(app->GetRenderer(), gFont, "3th place:     " + to_string(hScoreVec[2]), scoreTextColor);
         gScore.render(app->GetRenderer(), (SCREEN_WIDTH/2 - gScore.getWidth()/2), (SCREEN_HEIGHT/2 - gScore.getHeight()/2) +20);
         
         //render button
@@ -864,6 +932,8 @@ void close() {
 
 
 int main( int argc, char* args[] ) {
+    
+    readHighScoreFromFile();
     
     //create random seed
     srand((unsigned int)time(NULL));

@@ -20,7 +20,8 @@
 #include <math.h>
 #include <algorithm>
 #include <random>
-#include <ctime> 
+#include <ctime>
+#include <fstream>
 
 
 
