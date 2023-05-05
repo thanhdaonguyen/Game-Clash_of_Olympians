@@ -112,8 +112,8 @@ void Enemy::move() {
     shiftColliders();
     
     if (isHovering) {
-        if ((mTimer/73) % 2 == 0) mVelY = 1;
-        if ((mTimer/73) % 2 == 1) mVelY = -1;
+        if ((mTimer/129) % 2 == 0) mVelY = 1;
+        if ((mTimer/129) % 2 == 1) mVelY = -1;
         mTimer++;
     }
     
@@ -251,7 +251,7 @@ void Enemy::render() {
         SDL_RenderFillRect(mRenderer, &healthbarbound);
         SDL_SetRenderDrawColor(mRenderer, 255, 0, 0, 255);
         SDL_RenderFillRect(mRenderer, &healthbar);
-        mLTexture->render(mRenderer, mPosX, mPosY, &mClip, 1);
+        mLTexture->render(mRenderer, mPosX, mPosY, &mClip, 1.5);
     }
 }
 

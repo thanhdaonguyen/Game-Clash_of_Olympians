@@ -80,8 +80,25 @@ void HandleCollisionsSpearAndEnemy(vector<Dot*> dotVec, vector<Enemy*> emVec) {
 
 //Scene textures
 LTexture gBG(app->GetRenderer(),"assets/background.png");
+LTexture gMenuBG(app->GetRenderer(), "assets/menuBackground.jpeg");
 LTexture gHPTexture(app->GetRenderer());
 LTexture gScore(app->GetRenderer());
+LTexture gButton(app->GetRenderer());
+
+//state for the currently hovered button
+enum {
+    NONE_BUTTON,
+    PLAY_BUTTON,
+    HIGHSCORE_BUTTON,
+    QUIT_BUTTON,
+    MENU_BUTTON,
+    TRYAGAIN_BUTTON,
+    RESTART_BUTTON,
+    CONTINUE_BUTTON,
+    BACK_BUTTON,
+};
+
+int buttonState = NONE_BUTTON;
 
 TTF_Font* gFont = TTF_OpenFont( "assets/vinque/vinque.otf", 28 );
 
@@ -92,7 +109,7 @@ TTF_Font* gFont = TTF_OpenFont( "assets/vinque/vinque.otf", 28 );
 //Event handler
 SDL_Event e;
 //The hero
-Hero myHero(150,440,app->GetRenderer(),"assets/Shieldmaiden/4x/idle_1.png");
+Hero myHero(150,440,app->GetRenderer(),"assets/achillies/achillies1.png");
 //the dots (weapons) that will be moving on the screen
 vector<Dot*> dotVec;
 //the dots (bullet) of flying demon and gordon
@@ -104,7 +121,6 @@ vector<Enemy*> emVec;
 
 //function to add enemies to emVec
 void addToemVec(int score, int preScore) {
-    cout << score << endl;
     if (score < 10) {
         if (score % 3 == 0 && score > preScore) {
             emVec.push_back(new Enemy(1280,600,app->GetRenderer(),"Goblin","assets/goblin/goblinsword.png"));
@@ -192,11 +208,12 @@ Mix_Music *gMusic = Mix_LoadMUS( "assets/maintheme.mp3" );
 Mix_Chunk *gThrow = Mix_LoadWAV( "assets/throwsound.mp3" );
 //the timer for throwing spear
 Uint32 mTimer = 0;
-//the sign for playing
+//the sign for game state
 bool isPlaying = false;
 bool isMenu = true;
 bool isHighscore = false;
 bool isPause = false;
+bool isDied = false;
 //the score mile stone
 Uint32 scoreTimer = 0;
 Uint32 scoreTimer0 = 0;
@@ -231,13 +248,24 @@ void HandleCollisionsSpearAndReward(vector<Dot*> dotVec, vector<Reward*> rwdVec)
 //HANDLE ALL EVENTS
 void HandleEvent () {
     if (isMenu) {
+        
+        //popup animation for menu
+        buttonState = NONE_BUTTON;
+        int x, y;
+        SDL_GetMouseState(&x, &y);
+        if (475 < x && x < 725) {
+            if (486 < y && y < 534) buttonState = PLAY_BUTTON;
+            if (541 < y && y < 589) buttonState = HIGHSCORE_BUTTON;
+            if (596 < y && y < 644) buttonState = QUIT_BUTTON;
+        }
+        
         while( SDL_PollEvent( &e ) != 0 ) {
             
             //User requests play game
-            if (e.key.keysym.sym == SDLK_q) {
+            if (e.type == SDL_MOUSEBUTTONUP && buttonState == QUIT_BUTTON) {
                 app->EndAppLoop();
             }
-            if( e.key.keysym.sym == SDLK_p ) {
+            if( e.type == SDL_MOUSEBUTTONUP && buttonState == PLAY_BUTTON ) {
 
 //                //reset enemies
 //                addToemVec(score, preScore);
@@ -266,6 +294,10 @@ void HandleEvent () {
                 //reset state
                 isPlaying = true;
                 isMenu = false;
+            }
+            if (e.type == SDL_MOUSEBUTTONUP && buttonState == HIGHSCORE_BUTTON) {
+                isHighscore = true;
+                isMenu =false;
             }
         }
     }
@@ -424,23 +456,30 @@ void HandleEvent () {
         //end game
         if (HP <= 0) {
             HP = 0;
-            deleteEmVec();
-            deleteSpear();
-            deleteRwdVec();
-            deleteBulVec();
+            
             isPlaying = false;
-            isMenu = true;
+            isDied = true;
         }
     }
     
     if (isPause) {
+        //popup animation for menu
+        buttonState = NONE_BUTTON;
+        int x, y;
+        SDL_GetMouseState(&x, &y);
+        if (475 < x && x < 725) {
+            if (316 < y && y < 364) buttonState = CONTINUE_BUTTON;
+            if (376 < y && y < 424) buttonState = RESTART_BUTTON;
+            if (436 < y && y < 484) buttonState = MENU_BUTTON;
+        }
+        
         while( SDL_PollEvent( &e ) != 0 ) {
             //User requests quit
             if( e.key.keysym.sym == SDLK_q ) {
                 app->EndAppLoop();
             }
             //User requests restart
-            if( e.key.keysym.sym == SDLK_r ) {
+            if( e.type == SDL_MOUSEBUTTONUP && buttonState == RESTART_BUTTON ) {
                 
                 //delete bullets remain on the screen
                 deleteBulVec();
@@ -462,14 +501,14 @@ void HandleEvent () {
                 isPause = false;
             }
             //User requests continue
-            if( e.key.keysym.sym == SDLK_c ) {
+            if( e.type == SDL_MOUSEBUTTONUP && buttonState == CONTINUE_BUTTON ) {
                 timeCompen2 = SDL_GetTicks();
                 scoreTimer0 += timeCompen2 - timeCompen1;
                 isPlaying = true;
                 isPause = false;
             }
             
-            if( e.key.keysym.sym == SDLK_m ) {
+            if( e.type == SDL_MOUSEBUTTONUP && buttonState == MENU_BUTTON ) {
                 isMenu = true;
                 isPause = false;
             }
@@ -477,22 +516,171 @@ void HandleEvent () {
         }
     }
     
+    if (isDied) {
+        //popup animation for menu
+        buttonState = NONE_BUTTON;
+        int x, y;
+        SDL_GetMouseState(&x, &y);
+        if (475 < x && x < 725) {
+            if (296 < y && y < 344) buttonState = TRYAGAIN_BUTTON;
+            if (356 < y && y < 404) buttonState = MENU_BUTTON;
+        }
+        
+        while( SDL_PollEvent( &e ) != 0 ) {
+            
+            //User requests play game
+            if (e.type == SDL_MOUSEBUTTONUP && buttonState == MENU_BUTTON) {
+                deleteEmVec();
+                deleteSpear();
+                deleteRwdVec();
+                deleteBulVec();
+                isMenu = true;
+                isDied = false;
+            }
+            if (e.type == SDL_MOUSEBUTTONUP && buttonState == TRYAGAIN_BUTTON) {
+                
+                //delete bullets remain on the screen
+                deleteBulVec();
+                
+                //delete spears remain on the screen
+                deleteSpear();
+                
+                //delete rewards remain on the screen
+                deleteRwdVec();
+                
+                //delete enemies remain on the screen
+                deleteEmVec();
+                
+                //reset hero's abilities
+                myHero.speed = 1;
+                myHero.strength = 3;
+                
+                //reset score and HP
+                HP = 100;
+                scoreTimer = SDL_GetTicks();
+                scoreTimer0 = SDL_GetTicks();
+                //reset state
+                isPlaying = true;
+                isDied = false;
+            }
+        }
+    }
     
+    if (isHighscore) {
+        //popup animation for menu
+        buttonState = NONE_BUTTON;
+        int x, y;
+        SDL_GetMouseState(&x, &y);
+        if (475 < x && x < 725) {
+            if (426 < y && y < 474) buttonState = BACK_BUTTON;
+        }
+        
+        while( SDL_PollEvent( &e ) != 0 ) {
+            
+            if (e.type == SDL_MOUSEBUTTONUP && buttonState == BACK_BUTTON) {
+                isHighscore = false;
+                isMenu = true;
+            }
+        }
+    }
 }
 
 //HANDLE ALL RENDERINGS
 void HandleRendering () {
     
     if (isMenu) {
-        SDL_SetRenderDrawColor(app->GetRenderer(), 20, 20, 20, 0);
+        SDL_SetRenderDrawColor(app->GetRenderer(), 255, 255, 255, 0);
         SDL_RenderClear(app->GetRenderer());
+        SDL_RenderCopy(app->GetRenderer(), gMenuBG.mTexture, NULL, NULL);
         scoreTextColor = { 255, 188, 0 };
-        gScore.loadFromRenderedText(app->GetRenderer(), gFont, "CLASH OF OLYMPIANS", scoreTextColor);
-        gScore.render(app->GetRenderer(), (SCREEN_WIDTH/2 - gScore.getWidth()/2), (SCREEN_HEIGHT/2 - gScore.getHeight()/2));
-        gScore.loadFromRenderedText(app->GetRenderer(), gFont, "Press P to play game, H to show high score, Q to quit game", scoreTextColor);
-        gScore.render(app->GetRenderer(), (SCREEN_WIDTH/2 - gScore.getWidth()/2), (SCREEN_HEIGHT/2 - gScore.getHeight()/2) + 50);
+        
+        double a = 1;
+        double b = 1;
+        double c = 1;
+        
+        if (buttonState == PLAY_BUTTON) a = 1.1;
+        if (buttonState == HIGHSCORE_BUTTON) b = 1.1;
+        if (buttonState == QUIT_BUTTON) c = 1.1;
+        
+        gButton.loadFromFile(app->GetRenderer(), "assets/button/play.png");
+        gButton.render(app->GetRenderer(), (SCREEN_WIDTH/2 - gButton.getWidth()*a/2), (SCREEN_HEIGHT/2 - gButton.getHeight()*a/2) + 160, NULL, a);
+        gButton.loadFromFile(app->GetRenderer(), "assets/button/highscore.png");
+        gButton.render(app->GetRenderer(), (SCREEN_WIDTH/2 - gButton.getWidth()*b/2), (SCREEN_HEIGHT/2 - gButton.getHeight()*b/2) + 215, NULL, b);
+        gButton.loadFromFile(app->GetRenderer(), "assets/button/quit.png");
+        gButton.render(app->GetRenderer(), (SCREEN_WIDTH/2 - gButton.getWidth()*c/2), (SCREEN_HEIGHT/2 - gButton.getHeight()*c/2) + 270, NULL, c);
+        
+        
     }
     
+    if (isDied) {
+        
+        //Clear screen
+        SDL_SetRenderDrawColor(app->GetRenderer(), 255, 255, 255, 255);
+        SDL_RenderClear(app->GetRenderer());
+        
+        //render background
+        SDL_RenderCopy(app->GetRenderer(), gBG.mTexture, NULL, NULL);
+        //render hero
+        
+        myHero.render();
+        //render dots;
+        unsigned long k1 = 0, k2 = dotVec.size();
+        for(unsigned long i = k1; i < k2; i++) {
+            dotVec[i]->render();
+        }
+        
+        //render enemy
+        for (unsigned long i = 0; i < emVec.size(); i++) {
+            //        SDL_SetRenderDrawColor(app->GetRenderer(), 255, 255, 255, 255);
+            //        SDL_RenderFillRect(app->GetRenderer(), &emVec[i]->mColliders[0]);
+            emVec[i]->render();
+        }
+        //render bullets
+        for (unsigned long i = 0; i < bulVec.size(); i++) {
+            bulVec[i]->render();
+        }
+        //render reward
+        for (unsigned long i = 0; i < rwdVec.size(); i++) {
+            rwdVec[i]->render();
+        }
+        
+        //render force bar
+        SDL_SetRenderDrawColor(app->GetRenderer(), 140, 140, 140, 0); // set color to blue
+        SDL_RenderFillRect(app->GetRenderer(), &forcebarbound); // draw filled rectangle
+        SDL_SetRenderDrawColor(app->GetRenderer(), 218, 138, 47, 0); // set color to blue
+        SDL_RenderFillRect(app->GetRenderer(), &forcebar); // draw filled rectangle
+        
+        //Render HP to the screen
+        scoreTextColor = { 85, 117, 149 };
+        gHPTexture.loadFromRenderedText(app->GetRenderer(), gFont, to_string(HP), scoreTextColor);
+        gHPTexture.render(app->GetRenderer(), 75, 55);
+        //Render score to the screen
+        gScore.loadFromRenderedText(app->GetRenderer(), gFont, "Your score: " + to_string(score), scoreTextColor);
+        gScore.render(app->GetRenderer(), 20, 5);
+        
+        
+        //render pause menu text
+        gButton.loadFromFile(app->GetRenderer(), "assets/tabletemplate.jpg");
+        gButton.render(app->GetRenderer(),(SCREEN_WIDTH - gButton.getWidth())/2, (SCREEN_HEIGHT - gButton.getHeight())/2);
+//        scoreTextColor = { 255, 188, 0 };
+//        gScore.loadFromRenderedText(app->GetRenderer(), gFont, "YOU LOSE!", scoreTextColor);
+//        gScore.render(app->GetRenderer(), (SCREEN_WIDTH/2 - gScore.getWidth()/2), (SCREEN_HEIGHT/2 - gScore.getHeight()/2));
+//        gScore.loadFromRenderedText(app->GetRenderer(), gFont, "Press T to try again, M for menu", scoreTextColor);
+//        gScore.render(app->GetRenderer(), (SCREEN_WIDTH/2 - gScore.getWidth()/2), (SCREEN_HEIGHT/2 - gScore.getHeight()/2) + 50);
+        
+        //render buttons
+        double a = 1;
+        double b = 1;
+        
+        if (buttonState == TRYAGAIN_BUTTON) a = 1.1;
+        if (buttonState == MENU_BUTTON) b = 1.1;
+        
+        gButton.loadFromFile(app->GetRenderer(), "assets/button/tryagain.png");
+        gButton.render(app->GetRenderer(), (SCREEN_WIDTH/2 - gButton.getWidth()*a/2), (SCREEN_HEIGHT/2 - gButton.getHeight()*a/2) - 30, NULL, a);
+        gButton.loadFromFile(app->GetRenderer(), "assets/button/menu.png");
+        gButton.render(app->GetRenderer(), (SCREEN_WIDTH/2 - gButton.getWidth()*b/2), (SCREEN_HEIGHT/2 - gButton.getHeight()*b/2) + 30, NULL, b);
+       
+    }
     
     if (isPlaying) {
         //Clear screen
@@ -545,23 +733,103 @@ void HandleRendering () {
             gScore.render(app->GetRenderer(), (SCREEN_WIDTH/2 - gScore.getWidth()/2), (SCREEN_HEIGHT/2 - gScore.getHeight()/2));
         }
     }
-    //Play music
-    if( Mix_PlayingMusic() == 0 ) Mix_PlayMusic( gMusic, -1 );
-    
-    
-    
     //end game menu
     if (isPause) {
-        SDL_SetRenderDrawColor(app->GetRenderer(), 20, 20, 20, 0);
+        //Clear screen
+        SDL_SetRenderDrawColor(app->GetRenderer(), 255, 255, 255, 255);
         SDL_RenderClear(app->GetRenderer());
-        scoreTextColor = { 255, 188, 0 };
-        gScore.loadFromRenderedText(app->GetRenderer(), gFont, "YOU LOSE!", scoreTextColor);
-        gScore.render(app->GetRenderer(), (SCREEN_WIDTH/2 - gScore.getWidth()/2), (SCREEN_HEIGHT/2 - gScore.getHeight()/2));
-        gScore.loadFromRenderedText(app->GetRenderer(), gFont, "Press Q to quit game, R to restart, C to continue, M for menu", scoreTextColor);
-        gScore.render(app->GetRenderer(), (SCREEN_WIDTH/2 - gScore.getWidth()/2), (SCREEN_HEIGHT/2 - gScore.getHeight()/2) + 50);
+        
+        //render background
+        SDL_RenderCopy(app->GetRenderer(), gBG.mTexture, NULL, NULL);
+        //render hero
+        
+        myHero.render();
+        //render dots;
+        unsigned long k1 = 0, k2 = dotVec.size();
+        for(unsigned long i = k1; i < k2; i++) {
+            dotVec[i]->render();
+        }
+        
+        //render enemy
+        for (unsigned long i = 0; i < emVec.size(); i++) {
+            //        SDL_SetRenderDrawColor(app->GetRenderer(), 255, 255, 255, 255);
+            //        SDL_RenderFillRect(app->GetRenderer(), &emVec[i]->mColliders[0]);
+            emVec[i]->render();
+        }
+        //render bullets
+        for (unsigned long i = 0; i < bulVec.size(); i++) {
+            bulVec[i]->render();
+        }
+        //render reward
+        for (unsigned long i = 0; i < rwdVec.size(); i++) {
+            rwdVec[i]->render();
+        }
+        
+        //render force bar
+        SDL_SetRenderDrawColor(app->GetRenderer(), 140, 140, 140, 0); // set color to blue
+        SDL_RenderFillRect(app->GetRenderer(), &forcebarbound); // draw filled rectangle
+        SDL_SetRenderDrawColor(app->GetRenderer(), 218, 138, 47, 0); // set color to blue
+        SDL_RenderFillRect(app->GetRenderer(), &forcebar); // draw filled rectangle
+        
+        //Render HP to the screen
+        scoreTextColor = { 85, 117, 149 };
+        gHPTexture.loadFromRenderedText(app->GetRenderer(), gFont, to_string(HP), scoreTextColor);
+        gHPTexture.render(app->GetRenderer(), 75, 55);
+        //Render score to the screen
+        gScore.loadFromRenderedText(app->GetRenderer(), gFont, "Your score: " + to_string(score), scoreTextColor);
+        gScore.render(app->GetRenderer(), 20, 5);
+        
+        //render pause table
+        gButton.loadFromFile(app->GetRenderer(), "assets/tabletemplate.jpg");
+        gButton.render(app->GetRenderer(),(SCREEN_WIDTH - gButton.getWidth())/2, (SCREEN_HEIGHT - gButton.getHeight())/2);
+        
+        gButton.loadFromFile(app->GetRenderer(), "assets/button/PAUSE.png");
+        gButton.render(app->GetRenderer(), (SCREEN_WIDTH/2 - gButton.getWidth()/2), (SCREEN_HEIGHT/2 - gButton.getHeight()/2) - 100);
+        //render buttons
+        double a = 1;
+        double b = 1;
+        double c = 1;
+        
+        if (buttonState == CONTINUE_BUTTON) a = 1.1;
+        if (buttonState == RESTART_BUTTON) b = 1.1;
+        if (buttonState == MENU_BUTTON) c = 1.1;
+
+        
+        gButton.loadFromFile(app->GetRenderer(), "assets/button/continue.png");
+        gButton.render(app->GetRenderer(), (SCREEN_WIDTH/2 - gButton.getWidth()*a/2), (SCREEN_HEIGHT/2 - gButton.getHeight()*a/2) - 10, NULL, a);
+        gButton.loadFromFile(app->GetRenderer(), "assets/button/restart.png");
+        gButton.render(app->GetRenderer(), (SCREEN_WIDTH/2 - gButton.getWidth()*b/2), (SCREEN_HEIGHT/2 - gButton.getHeight()*b/2) + 50, NULL, b);
+        gButton.loadFromFile(app->GetRenderer(), "assets/button/menu.png");
+        gButton.render(app->GetRenderer(), (SCREEN_WIDTH/2 - gButton.getWidth()*c/2), (SCREEN_HEIGHT/2 - gButton.getHeight()*c/2) + 110, NULL, c);
     }
-    
-    
+    //highscore
+    if (isHighscore) {
+        SDL_SetRenderDrawColor(app->GetRenderer(), 255, 255, 255, 0);
+        SDL_RenderClear(app->GetRenderer());
+        SDL_RenderCopy(app->GetRenderer(), gMenuBG.mTexture, NULL, NULL);
+        
+        
+        //render highscore board
+        gButton.loadFromFile(app->GetRenderer(), "assets/tabletemplate.jpg");
+        gButton.render(app->GetRenderer(),(SCREEN_WIDTH - gButton.getWidth())/2, (SCREEN_HEIGHT - gButton.getHeight())/2);
+        
+        gScore.loadFromRenderedText(app->GetRenderer(), gFont, "1st place:     000", scoreTextColor);
+        gScore.render(app->GetRenderer(), (SCREEN_WIDTH/2 - gScore.getWidth()/2), (SCREEN_HEIGHT/2 - gScore.getHeight()/2) -80);
+        gScore.loadFromRenderedText(app->GetRenderer(), gFont, "2nd place:     000", scoreTextColor);
+        gScore.render(app->GetRenderer(), (SCREEN_WIDTH/2 - gScore.getWidth()/2), (SCREEN_HEIGHT/2 - gScore.getHeight()/2) -30);
+        gScore.loadFromRenderedText(app->GetRenderer(), gFont, "3th place:     000", scoreTextColor);
+        gScore.render(app->GetRenderer(), (SCREEN_WIDTH/2 - gScore.getWidth()/2), (SCREEN_HEIGHT/2 - gScore.getHeight()/2) +20);
+        
+        //render button
+        double a = 1;
+        if (buttonState == BACK_BUTTON) a = 1.1;
+        
+        gButton.loadFromFile(app->GetRenderer(), "assets/button/back.png");
+        gButton.render(app->GetRenderer(), (SCREEN_WIDTH/2 - gButton.getWidth()*a/2), (SCREEN_HEIGHT/2 - gButton.getHeight()*a/2) + 100, NULL, a);
+    }
+    //Play music
+    if( Mix_PlayingMusic() == 0 ) Mix_PlayMusic( gMusic, -1 );
+
 }
 
 //close the program
@@ -572,6 +840,8 @@ void close() {
     gBG.free();
     gHPTexture.free();
     gScore.free();
+    gMenuBG.free();
+    gButton.free();
     
     //Free global font
     TTF_CloseFont( gFont );
@@ -591,7 +861,6 @@ void close() {
     deleteRwdVec();
     
 }
-
 
 
 int main( int argc, char* args[] ) {
